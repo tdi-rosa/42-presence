@@ -579,6 +579,11 @@
       </div>
     </div>
 
+    <div class="card" id="updateBanner" hidden style="margin-bottom:16px" role="status">
+      <strong>Une mise à jour est disponible</strong>
+      <p class="small">Installe la nouvelle version pour découvrir les nouveautés.</p>
+      <button class="secondary-btn" id="updateBtn" style="width:100%">Mettre à jour</button>
+    </div>
     <section class="tab active" id="tab-badge">
       <div class="hero">
         <div class="eyebrow" id="heroLabel">Temps aujourd’hui</div>
@@ -683,6 +688,11 @@
         </div>
       </div>
 
+      <div class="section-title"><h2>Application</h2></div>
+      <div class="settings-list">
+        <div class="setting-row"><div><strong id="versionLabel"></strong><p id="updateStatus" role="status">Vérification au lancement et au retour dans l’app.</p></div><button class="mini-btn" id="checkUpdateBtn">Vérifier</button></div>
+        <div class="setting-row"><div><strong>Notes de mise à jour</strong><p>Retrouve les nouveautés de chaque version.</p></div><button class="mini-btn" id="releaseNotesBtn">Voir</button></div>
+      </div>
       <div class="section-title">
         <h2>Règles suivies</h2>
       </div>
@@ -1383,11 +1393,139 @@
     if (row) row.style.display = "none";
   });
 
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js").catch(() => {});
+  const APP_VERSION = "1.1.0";
+  const RELEASES = [
+    { version: "1.1.0", date: "2026-10-02", notes: [
+      "Une bannière te prévient lorsqu’une mise à jour est prête à installer.",
+      "Vérifie les mises à jour depuis l’onglet Données, sans réinstaller l’app.",
+      "Les nouveautés s’affichent après chaque mise à jour et restent consultables ici.",
+      "Tes heures enregistrées et ton chrono en cours sont conservés lors de la mise à jour."
+    ] },
+    { version: "1.0.0", notes: ["Première version : badge, historique, objectifs et sauvegardes JSON."] }
+  ];
+  let registration = null;
+  let applyingUpdate = false;
+  let updateTimer = null;
+  $("versionLabel").textContent = `42 Présence · ${APP_VERSION}`;
+
+  function showReleaseNotes(automatic = false) {
+    const key = "presence42_release_notes_seen";
+    if (automatic) {
+      try { if (localStorage.getItem(key) === APP_VERSION) return; } catch {}
+    }
+    const dialog = document.createElement("dialog");
+    dialog.className = "modal";
+    dialog.style.color = "var(--text)";
+    const title = document.createElement("h3");
+    title.textContent = automatic ? `Nouveautés · ${APP_VERSION}` : "Notes de mise à jour";
+    dialog.append(title);
+    (automatic ? RELEASES.slice(0, 1) : RELEASES).forEach(release => {
+      const heading = document.createElement("h4");
+      heading.textContent = `Version ${release.version}${release.date ? ` · ${release.date}` : ""}`;
+      const list = document.createElement("ul");
+      list.className = "small";
+      list.style.fontSize = "14px";
+      release.notes.forEach(note => {
+        const item = document.createElement("li");
+        item.textContent = note;
+        item.style.marginBottom = "10px";
+        list.append(item);
+      });
+      dialog.append(heading, list);
     });
+    const close = document.createElement("button");
+    close.className = "modal-submit";
+    close.textContent = "Compris";
+    close.onclick = () => dialog.close();
+    dialog.append(close);
+    dialog.addEventListener("close", () => {
+      try { localStorage.setItem(key, APP_VERSION); } catch {}
+      dialog.remove();
+    });
+    dialog.addEventListener("click", event => {
+      const rect = dialog.getBoundingClientRect();
+      if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close();
+    });
+    document.body.append(dialog);
+    dialog.showModal();
+    close.focus();
   }
+  $("releaseNotesBtn").onclick = () => showReleaseNotes();
+
+  function updateReady() {
+    if (!registration?.waiting) return;
+    $("updateBanner").hidden = false;
+    $("updateStatus").textContent = "Une nouvelle version est prête à installer.";
+  }
+  function watchWorker(worker) {
+    if (!worker) return;
+    const changed = () => {
+      if (worker.state === "installed") updateReady();
+      if (worker.state === "redundant") $("updateStatus").textContent = "La mise à jour a échoué. Réessaie.";
+    };
+    worker.addEventListener("statechange", changed);
+    changed();
+  }
+  async function checkUpdates(manual = false) {
+    if (!navigator.onLine) {
+      $("updateStatus").textContent = "Hors ligne : reconnecte-toi pour vérifier les mises à jour.";
+      return;
+    }
+    if (!registration) {
+      if (manual) $("updateStatus").textContent = "Le service de mise à jour n’est pas encore prêt. Réessaie.";
+      return;
+    }
+    $("checkUpdateBtn").disabled = true;
+    $("updateStatus").textContent = "Vérification en cours…";
+    try {
+      await registration.update();
+      if (registration.waiting) updateReady();
+      else $("updateStatus").textContent = registration.installing
+        ? "Téléchargement de la mise à jour…"
+        : "Tu disposes de la dernière version.";
+    } catch {
+      $("updateStatus").textContent = "Vérification impossible. Réessaie avec une connexion internet.";
+    } finally { $("checkUpdateBtn").disabled = false; }
+  }
+  $("checkUpdateBtn").onclick = () => checkUpdates(true);
+  $("updateBtn").onclick = () => {
+    if (!registration?.waiting || applyingUpdate) return;
+    applyingUpdate = true;
+    $("updateBtn").disabled = true;
+    $("updateBtn").textContent = "Installation…";
+    updateTimer = setTimeout(() => {
+      applyingUpdate = false;
+      $("updateBtn").disabled = false;
+      $("updateBtn").textContent = "Réessayer la mise à jour";
+      $("updateStatus").textContent = "L’installation prend plus de temps que prévu. Réessaie.";
+    }, 15000);
+    registration.waiting.postMessage({ type: "SKIP_WAITING" });
+  };
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (applyingUpdate) { clearTimeout(updateTimer); location.reload(); }
+    });
+    const registerUpdates = async () => {
+      try {
+        registration = await navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" });
+        registration.addEventListener("updatefound", () => watchWorker(registration.installing));
+        watchWorker(registration.installing);
+        updateReady();
+        await checkUpdates();
+      } catch {
+        $("updateStatus").textContent = "Mises à jour indisponibles pour le moment. Rouvre l’app pour réessayer.";
+      }
+    };
+    if (document.readyState === "complete") registerUpdates();
+    else window.addEventListener("load", registerUpdates, { once: true });
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) checkUpdates(); });
+    window.addEventListener("online", () => checkUpdates());
+    setInterval(() => { if (!document.hidden) checkUpdates(); }, 5 * 60 * 1000);
+  } else {
+    $("checkUpdateBtn").disabled = true;
+    $("updateStatus").textContent = "Les mises à jour nécessitent un navigateur compatible et une connexion HTTPS.";
+  }
+  showReleaseNotes(true);
 
   renderAll();
   setInterval(() => {
@@ -1399,3 +1537,4 @@
 </script>
 </body>
 </html>
+
