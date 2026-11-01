@@ -1,50 +1,47 @@
-# 42 Présence — mini app PWA
+# Dayflow
 
-Cette version est prête à être hébergée comme une Progressive Web App.
+Dayflow est une PWA mobile personnelle pour organiser la journée sans rigidifier l'emploi du temps : blocs récurrents, timeline quotidienne, semaine, suivi prévu/réalisé des heures à 42 et bilan du soir.
 
-Fichiers :
-- index.html : l'application
-- manifest.webmanifest : informations d'installation Android
-- sw.js : cache hors ligne
-- icon-192.png / icon-512.png : icônes
+Ce dépôt est l'évolution de **42 Présence**. Les anciennes données `presence42_v1` sont laissées intactes et importées une seule fois dans Dayflow au premier lancement.
 
-## Important
-Une PWA doit être servie en HTTPS (ou sur localhost) pour pouvoir être installée proprement.
-Ouvrir `index.html` directement depuis le gestionnaire de fichiers Android ne suffit pas pour le mode PWA/hors-ligne.
+## V1
 
-## Déploiement simple avec GitHub Pages
-1. Créer un dépôt GitHub, par exemple `presence42`.
-2. Mettre les 5 fichiers de ce dossier à la racine du dépôt.
-3. Dans GitHub : Settings > Pages.
-4. Dans "Build and deployment", choisir "Deploy from a branch".
-5. Choisir la branche `main` et le dossier `/ (root)`, puis Save.
-6. Ouvrir l'adresse GitHub Pages générée sur le téléphone.
-7. Dans Chrome : menu ⋮ > "Installer l'application" ou "Ajouter à l'écran d'accueil".
+- Vue Jour avec timeline 07:00–23:00.
+- Vue Semaine compacte.
+- Catégories : 42, obligations/administratif, déménagement, vie quotidienne, association/social, repos.
+- Déplacement tactile d'un bloc depuis sa poignée `⋮⋮`, par pas de 15 minutes.
+- Blocs hebdomadaires récurrents ; déplacer une occurrence ne change pas toute la série.
+- Distinction prévu / réalisé et heures réelles.
+- Bouton `42 maintenant` pour enregistrer une session réelle non planifiée.
+- Total 42 journalier et hebdomadaire, objectif de référence 35 h/semaine.
+- Bilan du soir conservé localement : énergie, points positifs, blocages, note.
+- Export JSON complet et export JSON des 14 derniers jours pour analyse dans ChatGPT.
+- PWA installable, hors-ligne, stockage local.
+- Mise à jour automatique du service worker après nouveau déploiement ; l'app se recharge sur la nouvelle version sans réinstallation.
 
-Les données sont stockées localement sur le téléphone via localStorage.
-Utiliser l'export JSON de temps en temps pour garder une sauvegarde.
+## Architecture
 
+Aucun framework ni build n'est nécessaire pour la V1.
 
-## Mises à jour et notes de version
+- `index.html` : structure de l'interface.
+- `styles.css` : interface mobile et timeline.
+- `app.js` : modèle local, récurrence, interactions, bilans et migration.
+- `sw.js` : cache offline et activation automatique des mises à jour.
+- `manifest.webmanifest` : installation Android.
+- `vercel.json` : en-têtes pour éviter de bloquer les mises à jour du service worker.
 
-La version 1.1.0 ajoute une bannière « Mettre à jour », une vérification manuelle
-et les notes de version dans Données. La vérification a lieu au lancement,
-au retour dans l’app, au rétablissement de la connexion et toutes les cinq minutes
-lorsque l’app est visible. La nouvelle version est téléchargée puis attend le clic
-sur « Mettre à jour » ; l’app se recharge après activation. Les nouveautés
-s’affichent une fois par version, et l’historique reste consultable dans Données.
-Le cache hors ligne est conservé et les données `presence42_v1` ne sont pas modifiées.
+Les données principales sont stockées sous `dayflow_v1` dans `localStorage`.
 
-Pour chaque future livraison :
-1. Incrémenter `APP_VERSION` dans index.html et ajouter une entrée en tête de `RELEASES`
-   avec la date et une liste de changements en français.
-2. Utiliser la même version dans `CACHE` de sw.js, afin de déclencher la mise à jour.
-3. Publier ces deux fichiers ensemble. Ne pas ajouter `skipWaiting()` dans install.
-4. Vérifier le passage depuis la version précédente, le mode hors ligne et la
-   conservation des sessions et du badge actif.
+## Déploiement Vercel
 
-### Première migration depuis la version 1.0
+Connecter ce dépôt à un projet Vercel et garder `main` comme branche de production. Il n'y a ni commande de build ni dossier de sortie : Vercel sert les fichiers statiques de la racine. Chaque push sur `main` produit alors un nouveau déploiement. Le service worker vérifie aussi les nouvelles versions au lancement, au retour dans l'app, au retour du réseau et périodiquement quand l'app est visible.
 
-L’ancienne version ne comporte aucun bouton de mise à jour. Ouvrir l’app connectée,
-la fermer puis la rouvrir après le téléchargement permet de recevoir ce nouveau
-système. Les mises à jour suivantes se feront depuis la bannière.
+## Développement local
+
+Un serveur HTTP local suffit :
+
+```bash
+python3 -m http.server 8000
+```
+
+Puis ouvrir `http://localhost:8000`.
