@@ -1,1540 +1,201 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0f1115" />
+  <meta name="theme-color" content="#f4f1ea" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="description" content="Dayflow — agenda personnel, suivi 42 et bilan du soir." />
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="./icon-192.png" />
   <link rel="apple-touch-icon" href="./icon-192.png" />
-  <title>42 Présence</title>
-  <style>
-    :root {
-      --bg: #0f1115;
-      --panel: #171a20;
-      --panel-2: #1d2128;
-      --text: #f5f7fb;
-      --muted: #9da6b5;
-      --line: #2b313b;
-      --accent: #00c4a7;
-      --accent-2: #56e0c6;
-      --warning: #f6bd60;
-      --danger: #ff6b6b;
-      --radius: 22px;
-      --shadow: 0 16px 40px rgba(0,0,0,.22);
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      background:
-        radial-gradient(circle at 20% 0%, rgba(0,196,167,.10), transparent 30%),
-        var(--bg);
-      color: var(--text);
-      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    button, input, select { font: inherit; }
-
-    button {
-      border: 0;
-      cursor: pointer;
-      color: inherit;
-    }
-
-    .app {
-      width: min(100%, 760px);
-      margin: 0 auto;
-      padding: max(18px, env(safe-area-inset-top)) 16px calc(92px + env(safe-area-inset-bottom));
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 800;
-      letter-spacing: -.02em;
-      font-size: 20px;
-    }
-
-    .logo {
-      width: 34px;
-      height: 34px;
-      border-radius: 11px;
-      display: grid;
-      place-items: center;
-      background: var(--accent);
-      color: #071311;
-      font-weight: 900;
-    }
-
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 11px;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: .05em;
-      color: var(--muted);
-    }
-
-    .status-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: #697386;
-    }
-
-    .status-pill.in { color: var(--accent-2); }
-    .status-pill.in .status-dot {
-      background: var(--accent);
-      box-shadow: 0 0 0 5px rgba(0,196,167,.12);
-    }
-
-    .hero {
-      background: linear-gradient(150deg, rgba(255,255,255,.035), rgba(255,255,255,.01));
-      border: 1px solid var(--line);
-      border-radius: 28px;
-      padding: 22px;
-      box-shadow: var(--shadow);
-    }
-
-    .eyebrow {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .10em;
-    }
-
-    .timer {
-      font-variant-numeric: tabular-nums;
-      font-size: clamp(48px, 13vw, 76px);
-      font-weight: 850;
-      letter-spacing: -.055em;
-      line-height: 1;
-      margin: 12px 0 8px;
-    }
-
-    .timer-sub {
-      color: var(--muted);
-      min-height: 24px;
-      font-size: 14px;
-    }
-
-    .badge-btn {
-      width: 100%;
-      margin-top: 20px;
-      min-height: 72px;
-      border-radius: 22px;
-      background: var(--accent);
-      color: #061613;
-      font-weight: 900;
-      font-size: 20px;
-      box-shadow: 0 13px 26px rgba(0,196,167,.18);
-      transition: transform .12s ease, filter .12s ease;
-    }
-
-    .badge-btn:active { transform: scale(.985); }
-    .badge-btn.out {
-      background: #eef2f6;
-      color: #11151a;
-      box-shadow: none;
-    }
-
-    .quick-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .secondary-btn {
-      min-height: 48px;
-      border-radius: 16px;
-      background: var(--panel-2);
-      border: 1px solid var(--line);
-      font-weight: 750;
-      color: #dce2ea;
-    }
-
-    .section-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 26px 2px 12px;
-    }
-
-    .section-title h2 {
-      font-size: 16px;
-      margin: 0;
-      letter-spacing: -.02em;
-    }
-
-    .month-nav {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .icon-btn {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      width: 34px; height: 34px;
-      border-radius: 11px;
-      display: grid;
-      place-items: center;
-    }
-
-    .goal-grid {
-      display: grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 12px;
-    }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 17px;
-    }
-
-    .goal-card {
-      min-height: 210px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .goal-value {
-      font-size: 34px;
-      font-weight: 850;
-      letter-spacing: -.04em;
-      margin-top: 7px;
-    }
-
-    .goal-value span {
-      color: var(--muted);
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    .progress {
-      height: 10px;
-      border-radius: 999px;
-      background: #242a33;
-      overflow: hidden;
-      margin: 14px 0 9px;
-    }
-
-    .progress > div {
-      height: 100%;
-      border-radius: inherit;
-      background: var(--accent);
-      width: 0%;
-      transition: width .25s ease;
-    }
-
-    .small {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
-    .metric-stack {
-      display: grid;
-      gap: 12px;
-    }
-
-    .metric-card {
-      min-height: 99px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .metric-number {
-      font-size: 25px;
-      font-weight: 850;
-      letter-spacing: -.035em;
-    }
-
-    .metric-label {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .chart-card {
-      padding: 14px 12px 10px;
-    }
-
-    #chart {
-      width: 100%;
-      height: 210px;
-      display: block;
-    }
-
-    .chart-legend {
-      display: flex;
-      gap: 16px;
-      color: var(--muted);
-      font-size: 11px;
-      padding: 0 8px 4px;
-    }
-
-    .legend-dot {
-      display: inline-block;
-      width: 10px;
-      height: 3px;
-      border-radius: 999px;
-      vertical-align: middle;
-      margin-right: 5px;
-      background: var(--accent);
-    }
-
-    .legend-dot.target {
-      background: #6c7585;
-    }
-
-    .history {
-      display: grid;
-      gap: 10px;
-    }
-
-    .day-card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 14px 15px;
-    }
-
-    .day-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .day-date { font-weight: 800; }
-    .day-total {
-      font-weight: 850;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .missing {
-      color: var(--warning);
-      font-size: 12px;
-      margin-top: 6px;
-      font-weight: 700;
-    }
-
-    .session-row {
-      margin-top: 9px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .session-actions {
-      display: flex;
-      gap: 6px;
-    }
-
-    .mini-btn {
-      background: #242a33;
-      border: 1px solid #303744;
-      border-radius: 9px;
-      padding: 6px 8px;
-      color: #cbd3dd;
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-    .mini-btn.danger { color: #ffaaa9; }
-
-    .empty {
-      text-align: center;
-      color: var(--muted);
-      padding: 32px 12px;
-    }
-
-    .bottom-nav {
-      position: fixed;
-      left: 50%;
-      bottom: max(12px, env(safe-area-inset-bottom));
-      transform: translateX(-50%);
-      width: min(calc(100% - 24px), 736px);
-      background: rgba(23,26,32,.92);
-      border: 1px solid var(--line);
-      backdrop-filter: blur(18px);
-      border-radius: 20px;
-      padding: 7px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      z-index: 20;
-      box-shadow: var(--shadow);
-    }
-
-    .nav-btn {
-      background: transparent;
-      border-radius: 14px;
-      min-height: 48px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .nav-btn.active {
-      background: #232933;
-      color: var(--text);
-    }
-
-    .tab { display: none; }
-    .tab.active { display: block; }
-
-    .settings-list { display: grid; gap: 10px; }
-
-    .setting-row {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 14px;
-      display: flex;
-      gap: 12px;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .setting-row strong { font-size: 14px; }
-    .setting-row p {
-      color: var(--muted);
-      font-size: 12px;
-      margin: 4px 0 0;
-      line-height: 1.45;
-    }
-
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.64);
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-      z-index: 50;
-      padding: 12px;
-    }
-
-    .modal-backdrop.open { display: flex; }
-
-    .modal {
-      width: min(100%, 720px);
-      background: #171b21;
-      border: 1px solid var(--line);
-      border-radius: 26px;
-      padding: 18px;
-      max-height: 88vh;
-      overflow: auto;
-      box-shadow: var(--shadow);
-    }
-
-    .modal-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-
-    .modal-head h3 { margin: 0; }
-
-    .segmented {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 5px;
-      padding: 5px;
-      border-radius: 14px;
-      background: #101319;
-      margin-bottom: 14px;
-    }
-
-    .segmented button {
-      background: transparent;
-      min-height: 42px;
-      border-radius: 10px;
-      color: var(--muted);
-      font-weight: 800;
-      font-size: 12px;
-    }
-
-    .segmented button.active {
-      background: #252b34;
-      color: var(--text);
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    label {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 750;
-      display: block;
-      margin-bottom: 6px;
-    }
-
-    input {
-      width: 100%;
-      background: #101319;
-      color: var(--text);
-      border: 1px solid var(--line);
-      border-radius: 13px;
-      padding: 13px;
-      outline: none;
-    }
-
-    input:focus { border-color: #4f5b6a; }
-
-    .modal-submit {
-      width: 100%;
-      margin-top: 16px;
-      min-height: 52px;
-      border-radius: 15px;
-      background: var(--accent);
-      color: #081613;
-      font-weight: 900;
-    }
-
-    .notice {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 10px;
-      line-height: 1.45;
-    }
-
-    .toast {
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      bottom: 90px;
-      background: #f2f5f8;
-      color: #11151a;
-      font-size: 13px;
-      font-weight: 800;
-      padding: 11px 15px;
-      border-radius: 999px;
-      opacity: 0;
-      pointer-events: none;
-      transition: .22s ease;
-      z-index: 100;
-      white-space: nowrap;
-      max-width: calc(100vw - 24px);
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    @media (max-width: 520px) {
-      .goal-grid { grid-template-columns: 1fr; }
-      .metric-stack { grid-template-columns: 1fr 1fr; }
-      .metric-card { min-height: 92px; }
-      .form-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+  <link rel="stylesheet" href="./styles.css" />
+  <title>Dayflow</title>
 </head>
 <body>
-  <main class="app">
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo">42</div>
-        <span>Présence</span>
+  <div id="app" class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">DAYFLOW</p>
+        <h1 id="pageTitle">Aujourd’hui</h1>
+        <p class="subline" id="pageSubtitle"></p>
       </div>
-      <div class="status-pill" id="statusPill">
-        <span class="status-dot"></span>
-        <span id="statusText">HORS 42</span>
-      </div>
-    </div>
+      <button class="icon-button" id="todayButton" type="button" aria-label="Revenir à aujourd’hui">●</button>
+    </header>
 
-    <div class="card" id="updateBanner" hidden style="margin-bottom:16px" role="status">
-      <strong>Une mise à jour est disponible</strong>
-      <p class="small">Installe la nouvelle version pour découvrir les nouveautés.</p>
-      <button class="secondary-btn" id="updateBtn" style="width:100%">Mettre à jour</button>
-    </div>
-    <section class="tab active" id="tab-badge">
-      <div class="hero">
-        <div class="eyebrow" id="heroLabel">Temps aujourd’hui</div>
-        <div class="timer" id="timer">00:00:00</div>
-        <div class="timer-sub" id="timerSub">Aucun badge actif</div>
-        <button class="badge-btn" id="badgeBtn">Badger mon entrée</button>
-        <div class="quick-actions">
-          <button class="secondary-btn" id="manualBtn">＋ Ajouter / corriger</button>
-          <button class="secondary-btn" id="goHistoryBtn">Historique</button>
+    <main>
+      <section id="screenAgenda" class="screen active" aria-label="Agenda">
+        <div class="control-row">
+          <div class="segmented" role="tablist" aria-label="Vue agenda">
+            <button class="segment active" data-view="day" type="button">Jour</button>
+            <button class="segment" data-view="week" type="button">Semaine</button>
+          </div>
+          <div class="date-nav">
+            <button class="icon-button small" id="prevDate" type="button" aria-label="Précédent">‹</button>
+            <button class="date-chip" id="dateChip" type="button"></button>
+            <button class="icon-button small" id="nextDate" type="button" aria-label="Suivant">›</button>
+          </div>
         </div>
-      </div>
 
-      <div class="section-title">
-        <h2>Ce mois-ci</h2>
-        <div class="month-nav">
-          <span id="currentMonthLabel"></span>
-        </div>
-      </div>
-
-      <div class="goal-grid">
-        <div class="card goal-card">
+        <section class="focus-card">
           <div>
-            <div class="eyebrow">Objectif mensuel</div>
-            <div class="goal-value"><span id="monthHours">0 h</span> <span>/ 140 h</span></div>
-            <div class="progress"><div id="monthProgress"></div></div>
-            <div class="small" id="monthRemaining">140 h restantes</div>
+            <p class="eyebrow">42 aujourd’hui</p>
+            <div class="focus-values">
+              <strong id="planned42Today">0 h</strong>
+              <span>prévu</span>
+              <strong id="actual42Today">0 h</strong>
+              <span>fait</span>
+            </div>
           </div>
-          <div class="small" id="paceMessage">Ton rythme apparaîtra dès que tu auras enregistré des heures.</div>
+          <button id="trackerButton" class="tracker-button" type="button">▶ 42 maintenant</button>
+        </section>
+
+        <div id="dayView" class="day-view"></div>
+        <div id="weekView" class="week-view" hidden></div>
+      </section>
+
+      <section id="screenReview" class="screen" aria-label="Bilan du soir">
+        <div class="review-summary card">
+          <div><span>42 prévu</span><strong id="reviewPlanned">0 h</strong></div>
+          <div><span>42 réalisé</span><strong id="reviewActual">0 h</strong></div>
         </div>
 
-        <div class="metric-stack">
-          <div class="card metric-card">
-            <div class="metric-label">Cette semaine</div>
-            <div class="metric-number" id="weekHours">0 h</div>
-            <div class="small">objectif 35 h</div>
+        <form id="reviewForm" class="review-form card">
+          <div class="field">
+            <label>Énergie / fatigue</label>
+            <div class="energy-picker" id="energyPicker" role="radiogroup" aria-label="Énergie de 1 à 5">
+              <button type="button" data-energy="1">1</button>
+              <button type="button" data-energy="2">2</button>
+              <button type="button" data-energy="3">3</button>
+              <button type="button" data-energy="4">4</button>
+              <button type="button" data-energy="5">5</button>
+            </div>
+            <p class="hint">1 = épuisé · 5 = très en forme</p>
           </div>
-          <div class="card metric-card">
-            <div class="metric-label">Moyenne hebdo</div>
-            <div class="metric-number" id="weeklyAverage">0 h</div>
-            <div class="small">sur les semaines commencées</div>
+          <div class="field">
+            <label for="workedWell">Ce qui a bien fonctionné</label>
+            <textarea id="workedWell" rows="3" placeholder="Ex. matinée 42 sans interruption"></textarea>
           </div>
-        </div>
-      </div>
+          <div class="field">
+            <label for="blockedBy">Ce qui m’a bloqué</label>
+            <textarea id="blockedBy" rows="3" placeholder="Ex. administratif dispersé"></textarea>
+          </div>
+          <div class="field">
+            <label for="reviewNote">Note libre</label>
+            <textarea id="reviewNote" rows="3" placeholder="Optionnel"></textarea>
+          </div>
+          <button class="primary-button" type="submit">Enregistrer le bilan</button>
+        </form>
 
-      <div class="section-title">
-        <h2>Progression cumulée</h2>
-      </div>
-      <div class="card chart-card">
-        <svg id="chart" viewBox="0 0 680 210" preserveAspectRatio="none" aria-label="Courbe des heures cumulées du mois"></svg>
-        <div class="chart-legend">
-          <span><i class="legend-dot"></i> Heures enregistrées</span>
-          <span><i class="legend-dot target"></i> Objectif 140 h</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="tab" id="tab-history">
-      <div class="section-title" style="margin-top:4px">
-        <h2>Historique</h2>
-        <div class="month-nav">
-          <button class="icon-btn" id="prevMonth" aria-label="Mois précédent">‹</button>
-          <span id="historyMonthLabel"></span>
-          <button class="icon-btn" id="nextMonth" aria-label="Mois suivant">›</button>
-        </div>
-      </div>
-      <div class="history" id="historyList"></div>
-    </section>
-
-    <section class="tab" id="tab-settings">
-      <div class="section-title" style="margin-top:4px">
-        <h2>Données</h2>
-      </div>
-      <div class="settings-list">
-        <div class="setting-row">
+        <div class="section-heading">
           <div>
-            <strong>Exporter une sauvegarde</strong>
-            <p>Télécharge toutes tes sessions en JSON.</p>
+            <p class="eyebrow">POUR CHATGPT</p>
+            <h2>Deux dernières semaines</h2>
           </div>
-          <button class="mini-btn" id="exportBtn">Exporter</button>
+          <button class="secondary-button compact" id="copyTwoWeeks" type="button">Copier JSON</button>
         </div>
-        <div class="setting-row">
-          <div>
-            <strong>Importer une sauvegarde</strong>
-            <p>Restaure un export précédent.</p>
+        <div id="reviewHistory" class="review-history"></div>
+      </section>
+
+      <section id="screenData" class="screen" aria-label="Données">
+        <section class="card week-goal-card">
+          <div class="week-goal-head">
+            <div>
+              <p class="eyebrow">42 CETTE SEMAINE</p>
+              <strong id="weekActual">0 h</strong>
+              <span id="weekPlanned">0 h prévu</span>
+            </div>
+            <span class="goal-badge">objectif 35 h</span>
           </div>
-          <button class="mini-btn" id="importBtn">Importer</button>
-          <input id="importFile" type="file" accept="application/json" hidden>
-        </div>
-        <div class="setting-row">
-          <div>
-            <strong>Stockage</strong>
-            <p>Les données restent uniquement dans ce navigateur et sur cet appareil.</p>
+          <div class="progress-track"><div id="weekProgress"></div></div>
+        </section>
+
+        <div class="settings-stack">
+          <div class="setting-row card">
+            <div><strong>Exporter toutes les données</strong><p>Agenda, heures 42 et bilans dans un fichier JSON.</p></div>
+            <button class="secondary-button compact" id="exportButton" type="button">Exporter</button>
           </div>
-        </div>
-
-        <div class="setting-row" id="installRow" style="display:none">
-          <div>
-            <strong>Installer l’application</strong>
-            <p>Ajoute 42 Présence à l’écran d’accueil et ouvre-la comme une vraie app.</p>
+          <div class="setting-row card">
+            <div><strong>Importer une sauvegarde</strong><p>Restaure un export Dayflow sur cet appareil.</p></div>
+            <button class="secondary-button compact" id="importButton" type="button">Importer</button>
+            <input id="importInput" type="file" accept="application/json" hidden />
           </div>
-          <button class="mini-btn" id="installBtn">Installer</button>
-        </div>
-      </div>
-
-      <div class="section-title"><h2>Application</h2></div>
-      <div class="settings-list">
-        <div class="setting-row"><div><strong id="versionLabel"></strong><p id="updateStatus" role="status">Vérification au lancement et au retour dans l’app.</p></div><button class="mini-btn" id="checkUpdateBtn">Vérifier</button></div>
-        <div class="setting-row"><div><strong>Notes de mise à jour</strong><p>Retrouve les nouveautés de chaque version.</p></div><button class="mini-btn" id="releaseNotesBtn">Voir</button></div>
-      </div>
-      <div class="section-title">
-        <h2>Règles suivies</h2>
-      </div>
-      <div class="card small" style="font-size:13px">
-        <p style="margin-top:0"><strong style="color:var(--text)">Objectif mensuel :</strong> 140 h.</p>
-        <p><strong style="color:var(--text)">Référence hebdomadaire :</strong> 35 h.</p>
-        <p style="margin-bottom:0">Les jours antérieurs à la première utilisation de l’outil sont affichés comme <strong style="color:var(--warning)">données manquantes</strong>, pas comme 0 h.</p>
-      </div>
-    </section>
-  </main>
-
-  <nav class="bottom-nav">
-    <button class="nav-btn active" data-tab="badge">Badge</button>
-    <button class="nav-btn" data-tab="history">Historique</button>
-    <button class="nav-btn" data-tab="settings">Données</button>
-  </nav>
-
-  <div class="modal-backdrop" id="manualModal">
-    <div class="modal">
-      <div class="modal-head">
-        <h3>Ajouter / corriger</h3>
-        <button class="icon-btn" id="closeModal">×</button>
-      </div>
-
-      <div class="segmented">
-        <button class="active" data-mode="completed">Créneau terminé</button>
-        <button data-mode="ongoing">Je suis déjà à 42</button>
-      </div>
-
-      <div id="completedForm">
-        <div class="form-grid">
-          <div>
-            <label for="manualDate">Date</label>
-            <input id="manualDate" type="date">
+          <div class="setting-row card" id="installRow" hidden>
+            <div><strong>Installer Dayflow</strong><p>Ajoute l’app à l’écran d’accueil Android.</p></div>
+            <button class="secondary-button compact" id="installButton" type="button">Installer</button>
           </div>
-          <div></div>
-          <div>
-            <label for="manualStart">Heure d’entrée</label>
-            <input id="manualStart" type="time">
-          </div>
-          <div>
-            <label for="manualEnd">Heure de sortie</label>
-            <input id="manualEnd" type="time">
+          <div class="setting-row card">
+            <div><strong>Mises à jour automatiques</strong><p id="updateStatus">Dayflow vérifie les nouvelles versions en ligne.</p></div>
+            <button class="secondary-button compact" id="checkUpdateButton" type="button">Vérifier</button>
           </div>
         </div>
-        <button class="modal-submit" id="saveCompleted">Ajouter ce créneau</button>
-        <div class="notice">Pour une présence qui passe minuit, utilise le badge normal : l’outil répartira automatiquement les heures sur les deux jours.</div>
-      </div>
 
-      <div id="ongoingForm" hidden>
-        <div class="form-grid">
-          <div>
-            <label for="ongoingDate">Date d’entrée</label>
-            <input id="ongoingDate" type="date">
-          </div>
-          <div>
-            <label for="ongoingTime">Heure d’entrée réelle</label>
-            <input id="ongoingTime" type="time">
-          </div>
+        <div class="section-heading">
+          <div><p class="eyebrow">CATÉGORIES</p><h2>Repères visuels</h2></div>
         </div>
-        <button class="modal-submit" id="saveOngoing">Démarrer le chrono depuis cette heure</button>
-        <div class="notice">Exemple : tu es à l’école depuis 3 h mais tu as oublié de badger. Entre l’heure réelle d’arrivée : le chrono repartira depuis ce moment.</div>
-      </div>
-    </div>
+        <div id="categoryLegend" class="category-legend"></div>
+
+        <p class="version-line" id="versionLine"></p>
+      </section>
+    </main>
+
+    <button id="addEventButton" class="fab" type="button" aria-label="Ajouter un bloc">＋</button>
+
+    <nav class="bottom-nav" aria-label="Navigation principale">
+      <button class="nav-button active" data-screen="agenda" type="button"><span>▤</span>Agenda</button>
+      <button class="nav-button" data-screen="review" type="button"><span>✓</span>Bilan</button>
+      <button class="nav-button" data-screen="data" type="button"><span>⋯</span>Données</button>
+    </nav>
   </div>
 
-  <div class="modal-backdrop" id="editModal">
-    <div class="modal">
-      <div class="modal-head">
-        <h3>Modifier le créneau</h3>
-        <button class="icon-btn" id="closeEditModal">×</button>
+  <div id="eventModalBackdrop" class="modal-backdrop" aria-hidden="true">
+    <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <div><p class="eyebrow">BLOC</p><h2 id="eventModalTitle">Nouveau bloc</h2></div>
+        <button class="icon-button" id="closeEventModal" type="button" aria-label="Fermer">×</button>
       </div>
-      <div class="form-grid">
-        <div>
-          <label for="editDate">Date</label>
-          <input id="editDate" type="date">
+      <form id="eventForm">
+        <input id="eventId" type="hidden" />
+        <input id="eventInstanceKey" type="hidden" />
+        <div class="field">
+          <label for="eventTitle">Titre</label>
+          <input id="eventTitle" required maxlength="80" placeholder="Ex. 42 — Transcendance" />
         </div>
-        <div></div>
-        <div>
-          <label for="editStart">Entrée</label>
-          <input id="editStart" type="time">
+        <div class="field">
+          <label for="eventCategory">Catégorie</label>
+          <select id="eventCategory"></select>
         </div>
-        <div>
-          <label for="editEnd">Sortie</label>
-          <input id="editEnd" type="time">
+        <div class="field-row three">
+          <div class="field"><label for="eventDate">Date</label><input id="eventDate" type="date" required /></div>
+          <div class="field"><label for="eventStart">Début</label><input id="eventStart" type="time" required /></div>
+          <div class="field"><label for="eventEnd">Fin</label><input id="eventEnd" type="time" required /></div>
         </div>
-      </div>
-      <button class="modal-submit" id="saveEdit">Enregistrer</button>
-    </div>
+        <label class="toggle-row"><input id="eventRecurring" type="checkbox" /><span>Répéter chaque semaine ce jour</span></label>
+        <label class="toggle-row"><input id="eventProtected" type="checkbox" /><span>Bloc protégé (repère visuel)</span></label>
+        <label class="toggle-row"><input id="eventDone" type="checkbox" /><span>Réalisé</span></label>
+        <div id="actualFields" class="actual-fields" hidden>
+          <div class="field-row two">
+            <div class="field"><label for="actualStart">Début réel</label><input id="actualStart" type="time" /></div>
+            <div class="field"><label for="actualEnd">Fin réelle</label><input id="actualEnd" type="time" /></div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="eventNote">Note</label>
+          <textarea id="eventNote" rows="2" maxlength="300" placeholder="Optionnel"></textarea>
+        </div>
+        <label id="seriesEditRow" class="toggle-row" hidden><input id="editWholeSeries" type="checkbox" /><span>Modifier toute la série récurrente</span></label>
+        <div class="sheet-actions">
+          <button id="deleteEventButton" class="danger-button" type="button" hidden>Supprimer</button>
+          <button class="primary-button" type="submit">Enregistrer</button>
+        </div>
+      </form>
+    </section>
   </div>
 
-  <div class="toast" id="toast"></div>
-
-<script>
-(() => {
-  const KEY = "presence42_v1";
-  const GOAL_MONTH = 140;
-  const GOAL_WEEK = 35;
-
-  const $ = (id) => document.getElementById(id);
-
-  const defaultState = () => ({
-    createdAt: new Date().toISOString(),
-    activeStart: null,
-    sessions: []
-  });
-
-  let state;
-  try {
-    state = JSON.parse(localStorage.getItem(KEY)) || defaultState();
-  } catch {
-    state = defaultState();
-  }
-  if (!state.createdAt) state.createdAt = new Date().toISOString();
-  if (!Array.isArray(state.sessions)) state.sessions = [];
-  if (!("activeStart" in state)) state.activeStart = null;
-
-  let historyCursor = new Date();
-  historyCursor.setDate(1);
-  historyCursor.setHours(12,0,0,0);
-  let editId = null;
-  let manualMode = "completed";
-
-  const fmtMonth = new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" });
-  const fmtDay = new Intl.DateTimeFormat("fr-FR", { weekday: "short", day: "numeric", month: "short" });
-
-  function save() {
-    localStorage.setItem(KEY, JSON.stringify(state));
-  }
-
-  function pad(n) { return String(n).padStart(2, "0"); }
-
-  function localDateKey(d) {
-    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-  }
-
-  function fromDateAndTime(dateStr, timeStr) {
-    const [y,m,d] = dateStr.split("-").map(Number);
-    const [hh,mm] = timeStr.split(":").map(Number);
-    return new Date(y, m-1, d, hh, mm, 0, 0);
-  }
-
-  function humanHours(ms) {
-    const h = ms / 3600000;
-    if (h < 10) return `${h.toFixed(1).replace(".", ",")} h`;
-    return `${h.toFixed(1).replace(".", ",")} h`;
-  }
-
-  function humanDuration(ms) {
-    const totalSeconds = Math.max(0, Math.floor(ms / 1000));
-    const h = Math.floor(totalSeconds / 3600);
-    const m = Math.floor((totalSeconds % 3600) / 60);
-    const s = totalSeconds % 60;
-    return `${pad(h)}:${pad(m)}:${pad(s)}`;
-  }
-
-  function timeOnly(iso) {
-    const d = new Date(iso);
-    return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  }
-
-  function dateOnly(iso) {
-    return localDateKey(new Date(iso));
-  }
-
-  function sessionEndMs(s) {
-    return s.end ? new Date(s.end).getTime() : Date.now();
-  }
-
-  function validSession(s) {
-    const a = new Date(s.start).getTime();
-    const b = sessionEndMs(s);
-    return Number.isFinite(a) && Number.isFinite(b) && b >= a;
-  }
-
-  function splitSessionByDay(session) {
-    if (!validSession(session)) return [];
-    let start = new Date(session.start);
-    let end = session.end ? new Date(session.end) : new Date();
-    const parts = [];
-
-    while (start < end) {
-      const next = new Date(start);
-      next.setHours(24, 0, 0, 0);
-      const partEnd = next < end ? next : end;
-      parts.push({
-        date: localDateKey(start),
-        ms: partEnd - start
-      });
-      start = partEnd;
-    }
-    return parts;
-  }
-
-  function allSessionsIncludingActive() {
-    const arr = [...state.sessions];
-    if (state.activeStart) {
-      arr.push({ id: "__active__", start: state.activeStart, end: null });
-    }
-    return arr;
-  }
-
-  function dailyTotalsForMonth(date) {
-    const y = date.getFullYear();
-    const m = date.getMonth();
-    const days = new Date(y, m + 1, 0).getDate();
-    const totals = {};
-    for (let d=1; d<=days; d++) {
-      totals[`${y}-${pad(m+1)}-${pad(d)}`] = 0;
-    }
-
-    for (const s of allSessionsIncludingActive()) {
-      for (const p of splitSessionByDay(s)) {
-        if (p.date.startsWith(`${y}-${pad(m+1)}-`)) {
-          totals[p.date] = (totals[p.date] || 0) + p.ms;
-        }
-      }
-    }
-    return totals;
-  }
-
-  function monthTotal(date) {
-    return Object.values(dailyTotalsForMonth(date)).reduce((a,b) => a+b, 0);
-  }
-
-  function startOfWeek(d) {
-    const x = new Date(d);
-    x.setHours(0,0,0,0);
-    const day = (x.getDay() + 6) % 7; // Monday = 0
-    x.setDate(x.getDate() - day);
-    return x;
-  }
-
-  function endOfWeek(d) {
-    const x = startOfWeek(d);
-    x.setDate(x.getDate() + 7);
-    return x;
-  }
-
-  function overlapMs(session, rangeStart, rangeEnd) {
-    const a = new Date(session.start).getTime();
-    const b = session.end ? new Date(session.end).getTime() : Date.now();
-    return Math.max(0, Math.min(b, rangeEnd.getTime()) - Math.max(a, rangeStart.getTime()));
-  }
-
-  function weekTotal(d) {
-    const ws = startOfWeek(d);
-    const we = endOfWeek(d);
-    return allSessionsIncludingActive().reduce((sum, s) => sum + overlapMs(s, ws, we), 0);
-  }
-
-  function weeklyAverageForMonth(date) {
-    const y = date.getFullYear();
-    const m = date.getMonth();
-    const monthStart = new Date(y, m, 1);
-    const now = new Date();
-    const until = (y === now.getFullYear() && m === now.getMonth())
-      ? now
-      : new Date(y, m + 1, 0, 23, 59, 59, 999);
-
-    if (until < monthStart) return 0;
-
-    const firstWeek = startOfWeek(monthStart);
-    const weeks = [];
-    for (let cursor = new Date(firstWeek); cursor <= until; cursor.setDate(cursor.getDate()+7)) {
-      const we = new Date(cursor); we.setDate(we.getDate()+7);
-      const rs = cursor < monthStart ? monthStart : new Date(cursor);
-      const monthEnd = new Date(y, m+1, 1);
-      const re = we > monthEnd ? monthEnd : we;
-      if (rs < re) {
-        let sum = 0;
-        for (const s of allSessionsIncludingActive()) sum += overlapMs(s, rs, re);
-        weeks.push(sum);
-      }
-    }
-    if (!weeks.length) return 0;
-    return weeks.reduce((a,b)=>a+b,0) / weeks.length;
-  }
-
-  function toast(msg) {
-    const t = $("toast");
-    t.textContent = msg;
-    t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 2100);
-  }
-
-  function renderStatus() {
-    const active = !!state.activeStart;
-    $("statusPill").classList.toggle("in", active);
-    $("statusText").textContent = active ? "À 42" : "HORS 42";
-    $("badgeBtn").textContent = active ? "Badger ma sortie" : "Badger mon entrée";
-    $("badgeBtn").classList.toggle("out", active);
-
-    if (active) {
-      const started = new Date(state.activeStart);
-      $("heroLabel").textContent = "Présence en cours";
-      $("timer").textContent = humanDuration(Date.now() - started.getTime());
-      $("timerSub").textContent = `Entrée à ${timeOnly(state.activeStart)} · le chrono continue même si tu fermes la page`;
-    } else {
-      const today = new Date();
-      const totals = dailyTotalsForMonth(today);
-      const t = totals[localDateKey(today)] || 0;
-      $("heroLabel").textContent = "Temps aujourd’hui";
-      $("timer").textContent = humanDuration(t);
-      $("timerSub").textContent = t ? `${humanHours(t)} enregistrées aujourd’hui` : "Aucun badge actif";
-    }
-  }
-
-  function renderDashboard() {
-    const now = new Date();
-    $("currentMonthLabel").textContent = fmtMonth.format(now);
-
-    const total = monthTotal(now);
-    const totalH = total / 3600000;
-    const pct = Math.min(100, (totalH / GOAL_MONTH) * 100);
-    $("monthHours").textContent = humanHours(total);
-    $("monthProgress").style.width = `${pct}%`;
-
-    const remain = Math.max(0, GOAL_MONTH - totalH);
-    $("monthRemaining").textContent = remain > 0
-      ? `${remain.toFixed(1).replace(".", ",")} h restantes`
-      : `Objectif atteint · +${(totalH-GOAL_MONTH).toFixed(1).replace(".", ",")} h`;
-
-    const wh = weekTotal(now);
-    $("weekHours").textContent = humanHours(wh);
-    $("weeklyAverage").textContent = humanHours(weeklyAverageForMonth(now));
-
-    const y = now.getFullYear(), m = now.getMonth();
-    const daysInMonth = new Date(y, m+1, 0).getDate();
-    const remainingDays = daysInMonth - now.getDate() + 1;
-    const currentPace = totalH / Math.max(1, now.getDate());
-    const projected = currentPace * daysInMonth;
-
-    if (totalH <= 0.01) {
-      $("paceMessage").textContent = "Ton rythme apparaîtra dès que tu auras enregistré des heures.";
-    } else if (totalH >= GOAL_MONTH) {
-      $("paceMessage").textContent = "Objectif mensuel déjà atteint.";
-    } else {
-      const neededPerCalendarDay = remain / Math.max(1, remainingDays);
-      $("paceMessage").textContent =
-        `À ce rythme : ~${projected.toFixed(0)} h fin de mois. Il reste ${neededPerCalendarDay.toFixed(1).replace(".", ",")} h/jour calendaire à moyenner.`;
-    }
-
-    drawChart(now);
-  }
-
-  function drawChart(date) {
-    const svg = $("chart");
-    const totals = dailyTotalsForMonth(date);
-    const keys = Object.keys(totals);
-    const values = [];
-    let cum = 0;
-    for (const k of keys) {
-      cum += totals[k] / 3600000;
-      values.push(cum);
-    }
-
-    const W = 680, H = 210;
-    const padL = 38, padR = 14, padT = 14, padB = 26;
-    const iw = W - padL - padR;
-    const ih = H - padT - padB;
-    const maxY = Math.max(GOAL_MONTH, ...values, 1) * 1.08;
-    const x = i => padL + (i / Math.max(1, keys.length - 1)) * iw;
-    const y = v => padT + ih - (v / maxY) * ih;
-
-    let html = "";
-
-    [0,35,70,105,140].forEach(v => {
-      if (v <= maxY) {
-        html += `<line x1="${padL}" y1="${y(v)}" x2="${W-padR}" y2="${y(v)}" stroke="#2a3039" stroke-width="1"/>`;
-        html += `<text x="${padL-8}" y="${y(v)+4}" fill="#7f8998" font-size="10" text-anchor="end">${v}</text>`;
-      }
-    });
-
-    const targetPoints = keys.map((_,i) => `${x(i)},${y(GOAL_MONTH * i / Math.max(1, keys.length-1))}`).join(" ");
-    html += `<polyline points="${targetPoints}" fill="none" stroke="#6c7585" stroke-width="2" stroke-dasharray="6 6" vector-effect="non-scaling-stroke"/>`;
-
-    if (values.some(v => v > 0)) {
-      const points = values.map((v,i) => `${x(i)},${y(v)}`).join(" ");
-      html += `<polyline points="${points}" fill="none" stroke="#00c4a7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`;
-
-      const now = new Date();
-      const sameMonth = date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
-      const lastIndex = sameMonth ? Math.min(now.getDate()-1, values.length-1) : values.length-1;
-      html += `<circle cx="${x(lastIndex)}" cy="${y(values[lastIndex])}" r="5" fill="#00c4a7"/>`;
-    }
-
-    html += `<text x="${padL}" y="${H-7}" fill="#7f8998" font-size="10">1</text>`;
-    html += `<text x="${W-padR}" y="${H-7}" fill="#7f8998" font-size="10" text-anchor="end">${keys.length}</text>`;
-    svg.innerHTML = html;
-  }
-
-  function dayIsMissing(date) {
-    const created = new Date(state.createdAt);
-    const d = new Date(date);
-    d.setHours(0,0,0,0);
-    const c = new Date(created);
-    c.setHours(0,0,0,0);
-    return d < c &&
-      d.getFullYear() === c.getFullYear() &&
-      d.getMonth() === c.getMonth();
-  }
-
-  function sessionsForDate(dateKey) {
-    return state.sessions.filter(s => dateOnly(s.start) === dateKey);
-  }
-
-  function renderHistory() {
-    $("historyMonthLabel").textContent = fmtMonth.format(historyCursor);
-    const y = historyCursor.getFullYear();
-    const m = historyCursor.getMonth();
-    const days = new Date(y, m+1, 0).getDate();
-    const totals = dailyTotalsForMonth(historyCursor);
-    const now = new Date();
-    const list = [];
-
-    for (let day = days; day >= 1; day--) {
-      const d = new Date(y, m, day);
-      if (d > now && y === now.getFullYear() && m === now.getMonth()) continue;
-      const key = localDateKey(d);
-      const sessions = sessionsForDate(key);
-      const missing = dayIsMissing(d);
-      const total = totals[key] || 0;
-      let body = "";
-
-      if (missing) {
-        body += `<div class="missing">Données manquantes</div>`;
-      } else if (!sessions.length && total === 0) {
-        body += `<div class="small" style="margin-top:6px">Aucun créneau enregistré</div>`;
-      }
-
-      sessions.forEach(s => {
-        body += `
-          <div class="session-row">
-            <span>${timeOnly(s.start)} → ${timeOnly(s.end)} · ${humanHours(new Date(s.end)-new Date(s.start))}</span>
-            <span class="session-actions">
-              <button class="mini-btn" data-edit="${s.id}">Modifier</button>
-              <button class="mini-btn danger" data-delete="${s.id}">Suppr.</button>
-            </span>
-          </div>`;
-      });
-
-      if (state.activeStart && dateOnly(state.activeStart) === key) {
-        body += `<div class="session-row"><span>${timeOnly(state.activeStart)} → maintenant · en cours</span></div>`;
-      }
-
-      list.push(`
-        <div class="day-card">
-          <div class="day-head">
-            <div class="day-date">${fmtDay.format(d)}</div>
-            <div class="day-total">${missing && total === 0 ? "—" : humanHours(total)}</div>
-          </div>
-          ${body}
-        </div>
-      `);
-    }
-    $("historyList").innerHTML = list.join("") || `<div class="empty">Aucune donnée pour ce mois.</div>`;
-
-    document.querySelectorAll("[data-delete]").forEach(btn => {
-      btn.onclick = () => deleteSession(btn.dataset.delete);
-    });
-    document.querySelectorAll("[data-edit]").forEach(btn => {
-      btn.onclick = () => openEdit(btn.dataset.edit);
-    });
-  }
-
-  function switchTab(name) {
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-    $(`tab-${name}`).classList.add("active");
-    document.querySelector(`.nav-btn[data-tab="${name}"]`).classList.add("active");
-    if (name === "history") renderHistory();
-  }
-
-  function badge() {
-    if (!state.activeStart) {
-      state.activeStart = new Date().toISOString();
-      save();
-      toast("Entrée enregistrée");
-    } else {
-      const end = new Date().toISOString();
-      const startMs = new Date(state.activeStart).getTime();
-      if (Date.now() - startMs < 5000) {
-        toast("Badge trop rapproché — rien enregistré");
-        return;
-      }
-      state.sessions.push({
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-        start: state.activeStart,
-        end
-      });
-      state.activeStart = null;
-      save();
-      toast("Sortie enregistrée");
-    }
-    renderAll();
-  }
-
-  function openManual() {
-    const today = localDateKey(new Date());
-    $("manualDate").value = today;
-    $("ongoingDate").value = today;
-
-    const now = new Date();
-    const threeHoursAgo = new Date(now.getTime() - 3*3600000);
-    $("manualStart").value = `${pad(threeHoursAgo.getHours())}:${pad(threeHoursAgo.getMinutes())}`;
-    $("manualEnd").value = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
-    $("ongoingTime").value = `${pad(threeHoursAgo.getHours())}:${pad(threeHoursAgo.getMinutes())}`;
-
-    setManualMode("completed");
-    $("manualModal").classList.add("open");
-  }
-
-  function setManualMode(mode) {
-    manualMode = mode;
-    document.querySelectorAll(".segmented button").forEach(b => b.classList.toggle("active", b.dataset.mode === mode));
-    $("completedForm").hidden = mode !== "completed";
-    $("ongoingForm").hidden = mode !== "ongoing";
-  }
-
-  function addCompleted() {
-    const d = $("manualDate").value;
-    const st = $("manualStart").value;
-    const et = $("manualEnd").value;
-    if (!d || !st || !et) return toast("Renseigne la date et les deux heures");
-
-    const start = fromDateAndTime(d, st);
-    const end = fromDateAndTime(d, et);
-    if (end <= start) return toast("L’heure de sortie doit être après l’entrée");
-
-    state.sessions.push({
-      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-      start: start.toISOString(),
-      end: end.toISOString()
-    });
-    save();
-    $("manualModal").classList.remove("open");
-    toast("Créneau ajouté");
-    renderAll();
-  }
-
-  function startOngoingManual() {
-    if (state.activeStart) return toast("Un badge est déjà actif");
-    const d = $("ongoingDate").value;
-    const t = $("ongoingTime").value;
-    if (!d || !t) return toast("Renseigne l’heure d’entrée réelle");
-    const start = fromDateAndTime(d, t);
-    if (start > new Date()) return toast("L’heure d’entrée ne peut pas être dans le futur");
-
-    state.activeStart = start.toISOString();
-    save();
-    $("manualModal").classList.remove("open");
-    toast("Chrono repris depuis l’heure indiquée");
-    renderAll();
-  }
-
-  function deleteSession(id) {
-    const s = state.sessions.find(x => x.id === id);
-    if (!s) return;
-    const ok = confirm(`Supprimer le créneau ${timeOnly(s.start)} → ${timeOnly(s.end)} ?`);
-    if (!ok) return;
-    state.sessions = state.sessions.filter(x => x.id !== id);
-    save();
-    toast("Créneau supprimé");
-    renderAll();
-  }
-
-  function openEdit(id) {
-    const s = state.sessions.find(x => x.id === id);
-    if (!s) return;
-    editId = id;
-    $("editDate").value = dateOnly(s.start);
-    $("editStart").value = timeOnly(s.start);
-    $("editEnd").value = timeOnly(s.end);
-    $("editModal").classList.add("open");
-  }
-
-  function saveEdit() {
-    const s = state.sessions.find(x => x.id === editId);
-    if (!s) return;
-    const d = $("editDate").value;
-    const st = $("editStart").value;
-    const et = $("editEnd").value;
-    const start = fromDateAndTime(d, st);
-    const end = fromDateAndTime(d, et);
-    if (end <= start) return toast("L’heure de sortie doit être après l’entrée");
-    s.start = start.toISOString();
-    s.end = end.toISOString();
-    save();
-    $("editModal").classList.remove("open");
-    toast("Créneau modifié");
-    renderAll();
-  }
-
-  function exportData() {
-    const payload = JSON.stringify({
-      app: "42 Présence",
-      version: 1,
-      exportedAt: new Date().toISOString(),
-      data: state
-    }, null, 2);
-
-    const blob = new Blob([payload], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `presence-42-${localDateKey(new Date())}.json`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-
-  function importData(file) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const parsed = JSON.parse(reader.result);
-        const incoming = parsed.data || parsed;
-        if (!incoming || !Array.isArray(incoming.sessions)) throw new Error("format");
-        state = {
-          createdAt: incoming.createdAt || new Date().toISOString(),
-          activeStart: incoming.activeStart || null,
-          sessions: incoming.sessions
-        };
-        save();
-        toast("Sauvegarde restaurée");
-        renderAll();
-      } catch {
-        toast("Fichier de sauvegarde invalide");
-      }
-    };
-    reader.readAsText(file);
-  }
-
-  function renderAll() {
-    renderStatus();
-    renderDashboard();
-    renderHistory();
-  }
-
-  document.querySelectorAll(".nav-btn").forEach(btn => btn.onclick = () => switchTab(btn.dataset.tab));
-  $("goHistoryBtn").onclick = () => switchTab("history");
-  $("badgeBtn").onclick = badge;
-  $("manualBtn").onclick = openManual;
-  $("closeModal").onclick = () => $("manualModal").classList.remove("open");
-  $("manualModal").onclick = (e) => { if (e.target === $("manualModal")) $("manualModal").classList.remove("open"); };
-  document.querySelectorAll(".segmented button").forEach(btn => btn.onclick = () => setManualMode(btn.dataset.mode));
-  $("saveCompleted").onclick = addCompleted;
-  $("saveOngoing").onclick = startOngoingManual;
-
-  $("closeEditModal").onclick = () => $("editModal").classList.remove("open");
-  $("editModal").onclick = (e) => { if (e.target === $("editModal")) $("editModal").classList.remove("open"); };
-  $("saveEdit").onclick = saveEdit;
-
-  $("prevMonth").onclick = () => {
-    historyCursor.setMonth(historyCursor.getMonth()-1);
-    renderHistory();
-  };
-  $("nextMonth").onclick = () => {
-    historyCursor.setMonth(historyCursor.getMonth()+1);
-    renderHistory();
-  };
-
-  $("exportBtn").onclick = exportData;
-  $("importBtn").onclick = () => $("importFile").click();
-  $("importFile").onchange = (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (file) importData(file);
-    e.target.value = "";
-  };
-
-  // Installation PWA
-  let deferredInstallPrompt = null;
-
-  window.addEventListener("beforeinstallprompt", (event) => {
-    event.preventDefault();
-    deferredInstallPrompt = event;
-    const row = $("installRow");
-    if (row) row.style.display = "flex";
-  });
-
-  const installBtn = $("installBtn");
-  if (installBtn) {
-    installBtn.onclick = async () => {
-      if (!deferredInstallPrompt) {
-        toast("Utilise le menu du navigateur → Installer l’application");
-        return;
-      }
-      deferredInstallPrompt.prompt();
-      await deferredInstallPrompt.userChoice;
-      deferredInstallPrompt = null;
-      $("installRow").style.display = "none";
-    };
-  }
-
-  window.addEventListener("appinstalled", () => {
-    toast("42 Présence est installée");
-    const row = $("installRow");
-    if (row) row.style.display = "none";
-  });
-
-  const APP_VERSION = "1.1.0";
-  const RELEASES = [
-    { version: "1.1.0", date: "2026-10-02", notes: [
-      "Une bannière te prévient lorsqu’une mise à jour est prête à installer.",
-      "Vérifie les mises à jour depuis l’onglet Données, sans réinstaller l’app.",
-      "Les nouveautés s’affichent après chaque mise à jour et restent consultables ici.",
-      "Tes heures enregistrées et ton chrono en cours sont conservés lors de la mise à jour."
-    ] },
-    { version: "1.0.0", notes: ["Première version : badge, historique, objectifs et sauvegardes JSON."] }
-  ];
-  let registration = null;
-  let applyingUpdate = false;
-  let updateTimer = null;
-  $("versionLabel").textContent = `42 Présence · ${APP_VERSION}`;
-
-  function showReleaseNotes(automatic = false) {
-    const key = "presence42_release_notes_seen";
-    if (automatic) {
-      try { if (localStorage.getItem(key) === APP_VERSION) return; } catch {}
-    }
-    const dialog = document.createElement("dialog");
-    dialog.className = "modal";
-    dialog.style.color = "var(--text)";
-    const title = document.createElement("h3");
-    title.textContent = automatic ? `Nouveautés · ${APP_VERSION}` : "Notes de mise à jour";
-    dialog.append(title);
-    (automatic ? RELEASES.slice(0, 1) : RELEASES).forEach(release => {
-      const heading = document.createElement("h4");
-      heading.textContent = `Version ${release.version}${release.date ? ` · ${release.date}` : ""}`;
-      const list = document.createElement("ul");
-      list.className = "small";
-      list.style.fontSize = "14px";
-      release.notes.forEach(note => {
-        const item = document.createElement("li");
-        item.textContent = note;
-        item.style.marginBottom = "10px";
-        list.append(item);
-      });
-      dialog.append(heading, list);
-    });
-    const close = document.createElement("button");
-    close.className = "modal-submit";
-    close.textContent = "Compris";
-    close.onclick = () => dialog.close();
-    dialog.append(close);
-    dialog.addEventListener("close", () => {
-      try { localStorage.setItem(key, APP_VERSION); } catch {}
-      dialog.remove();
-    });
-    dialog.addEventListener("click", event => {
-      const rect = dialog.getBoundingClientRect();
-      if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close();
-    });
-    document.body.append(dialog);
-    dialog.showModal();
-    close.focus();
-  }
-  $("releaseNotesBtn").onclick = () => showReleaseNotes();
-
-  function updateReady() {
-    if (!registration?.waiting) return;
-    $("updateBanner").hidden = false;
-    $("updateStatus").textContent = "Une nouvelle version est prête à installer.";
-  }
-  function watchWorker(worker) {
-    if (!worker) return;
-    const changed = () => {
-      if (worker.state === "installed") updateReady();
-      if (worker.state === "redundant") $("updateStatus").textContent = "La mise à jour a échoué. Réessaie.";
-    };
-    worker.addEventListener("statechange", changed);
-    changed();
-  }
-  async function checkUpdates(manual = false) {
-    if (!navigator.onLine) {
-      $("updateStatus").textContent = "Hors ligne : reconnecte-toi pour vérifier les mises à jour.";
-      return;
-    }
-    if (!registration) {
-      if (manual) $("updateStatus").textContent = "Le service de mise à jour n’est pas encore prêt. Réessaie.";
-      return;
-    }
-    $("checkUpdateBtn").disabled = true;
-    $("updateStatus").textContent = "Vérification en cours…";
-    try {
-      await registration.update();
-      if (registration.waiting) updateReady();
-      else $("updateStatus").textContent = registration.installing
-        ? "Téléchargement de la mise à jour…"
-        : "Tu disposes de la dernière version.";
-    } catch {
-      $("updateStatus").textContent = "Vérification impossible. Réessaie avec une connexion internet.";
-    } finally { $("checkUpdateBtn").disabled = false; }
-  }
-  $("checkUpdateBtn").onclick = () => checkUpdates(true);
-  $("updateBtn").onclick = () => {
-    if (!registration?.waiting || applyingUpdate) return;
-    applyingUpdate = true;
-    $("updateBtn").disabled = true;
-    $("updateBtn").textContent = "Installation…";
-    updateTimer = setTimeout(() => {
-      applyingUpdate = false;
-      $("updateBtn").disabled = false;
-      $("updateBtn").textContent = "Réessayer la mise à jour";
-      $("updateStatus").textContent = "L’installation prend plus de temps que prévu. Réessaie.";
-    }, 15000);
-    registration.waiting.postMessage({ type: "SKIP_WAITING" });
-  };
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (applyingUpdate) { clearTimeout(updateTimer); location.reload(); }
-    });
-    const registerUpdates = async () => {
-      try {
-        registration = await navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" });
-        registration.addEventListener("updatefound", () => watchWorker(registration.installing));
-        watchWorker(registration.installing);
-        updateReady();
-        await checkUpdates();
-      } catch {
-        $("updateStatus").textContent = "Mises à jour indisponibles pour le moment. Rouvre l’app pour réessayer.";
-      }
-    };
-    if (document.readyState === "complete") registerUpdates();
-    else window.addEventListener("load", registerUpdates, { once: true });
-    document.addEventListener("visibilitychange", () => { if (!document.hidden) checkUpdates(); });
-    window.addEventListener("online", () => checkUpdates());
-    setInterval(() => { if (!document.hidden) checkUpdates(); }, 5 * 60 * 1000);
-  } else {
-    $("checkUpdateBtn").disabled = true;
-    $("updateStatus").textContent = "Les mises à jour nécessitent un navigateur compatible et une connexion HTTPS.";
-  }
-  showReleaseNotes(true);
-
-  renderAll();
-  setInterval(() => {
-    renderStatus();
-    renderDashboard();
-    if ($("tab-history").classList.contains("active")) renderHistory();
-  }, 1000);
-})();
-</script>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="./app.js" defer></script>
 </body>
 </html>
-
