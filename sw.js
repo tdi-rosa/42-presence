@@ -1,10 +1,12 @@
-const CACHE_NAME = "dayflow-v2.1.0";
+const CACHE_NAME = "dayflow-v2.2.0";
 const SHELL = [
   "./",
   "./index.html",
   "./styles.css",
   "./review-journal.css",
+  "./important-alerts.css",
   "./schedule-2026w45.js",
+  "./important-alerts.js",
   "./review-journal.js",
   "./app.js",
   "./manifest.webmanifest",
