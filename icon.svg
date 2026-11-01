@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Dayflow">
+  <rect width="512" height="512" fill="#ffffff"/>
+  <g fill="none" stroke="#111111" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M256 360C256 310 254 264 250 218"/>
+    <path d="M250 250C215 245 184 221 169 184C207 181 241 198 256 231"/>
+    <path d="M251 224C269 171 311 132 365 121C369 178 344 226 299 249C280 259 264 273 256 291"/>
+  </g>
+</svg>
