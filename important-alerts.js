@@ -1,0 +1,123 @@
+(() => {
+  "use strict";
+
+  const STATE_KEY = "dayflow_v1";
+  const ALERTS_VERSION = 1;
+
+  const seededAlerts = [
+    {
+      id: "alert-shower-gel-2026-11-01",
+      title: "Acheter du gel douche",
+      detail: "À acheter dès que possible.",
+      symbol: "!",
+      priority: "high",
+      done: false,
+      createdAt: "2026-11-01T23:23:00+01:00"
+    },
+    {
+      id: "alert-freebox-fiber-2026-11-04",
+      title: "Prendre la box Free avec moi",
+      detail: "À ne pas oublier lundi ou mardi en allant à l’appartement · technicien fibre mercredi 4 novembre.",
+      symbol: "↯",
+      priority: "critical",
+      done: false,
+      dueDate: "2026-11-03",
+      createdAt: "2026-11-01T23:23:00+01:00"
+    }
+  ];
+
+  seedAlerts();
+  renderAlerts();
+
+  document.querySelectorAll('.nav-button[data-screen="agenda"]').forEach(button => {
+    button.addEventListener("click", () => setTimeout(renderAlerts, 0));
+  });
+
+  function readState() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STATE_KEY));
+      return parsed && typeof parsed === "object" ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function writeState(state) {
+    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+  }
+
+  function seedAlerts() {
+    const state = readState();
+    if (!state) return;
+    if (!Array.isArray(state.alerts)) state.alerts = [];
+
+    seededAlerts.forEach(alert => {
+      if (!state.alerts.some(item => item?.id === alert.id)) state.alerts.push(alert);
+    });
+    state.alertsVersion = Math.max(Number(state.alertsVersion) || 0, ALERTS_VERSION);
+    writeState(state);
+  }
+
+  function renderAlerts() {
+    const screen = document.getElementById("screenAgenda");
+    if (!screen) return;
+    const state = readState();
+    if (!state) return;
+
+    const active = (state.alerts || []).filter(alert => alert && !alert.done);
+    let host = document.getElementById("importantAlerts");
+    if (!host) {
+      host = document.createElement("section");
+      host.id = "importantAlerts";
+      host.className = "important-alerts";
+      const controls = screen.querySelector(".control-row");
+      if (controls?.nextSibling) screen.insertBefore(host, controls.nextSibling);
+      else screen.prepend(host);
+    }
+
+    host.hidden = active.length === 0;
+    if (!active.length) {
+      host.innerHTML = "";
+      return;
+    }
+
+    host.innerHTML = `
+      <p class="alert-kicker">IMPORTANT · À NE PAS OUBLIER</p>
+      ${active.map(alert => `
+        <article class="important-alert" data-alert-id="${escapeHtml(alert.id)}">
+          <div class="alert-icon" aria-hidden="true">${escapeHtml(alert.symbol || "!")}</div>
+          <div class="alert-copy">
+            <p class="alert-title">${escapeHtml(alert.title)}</p>
+            <p class="alert-meta">${escapeHtml(alert.detail || "")}</p>
+          </div>
+          <button class="alert-done" type="button" data-done-id="${escapeHtml(alert.id)}">Fait</button>
+        </article>
+      `).join("")}
+    `;
+
+    host.querySelectorAll("[data-done-id]").forEach(button => {
+      button.addEventListener("click", () => markDone(button.dataset.doneId));
+    });
+  }
+
+  function markDone(id) {
+    const state = readState();
+    if (!state || !Array.isArray(state.alerts)) return;
+    const alert = state.alerts.find(item => item?.id === id);
+    if (!alert) return;
+    alert.done = true;
+    alert.doneAt = new Date().toISOString();
+    writeState(state);
+    renderAlerts();
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>'"]/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "'": "&#39;",
+      '"': "&quot;"
+    }[char]));
+  }
+})();
