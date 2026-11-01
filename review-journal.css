@@ -1,0 +1,151 @@
+.review-summary,
+.review-form {
+  display: none !important;
+}
+
+.journal-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: 22px;
+  box-shadow: 0 10px 30px rgba(43, 38, 29, .04);
+  margin-bottom: 18px;
+}
+
+.journal-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.journal-kicker::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.journal-title {
+  font-size: 28px;
+  line-height: 1.05;
+  letter-spacing: -.045em;
+  margin: 0 0 10px;
+}
+
+.journal-lead {
+  margin: 0 0 20px;
+  color: #4e4b45;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.journal-moments {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.journal-moment {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  gap: 11px;
+  align-items: start;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.journal-moment:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.journal-symbol {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--ink);
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-weight: 850;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.journal-moment strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 14px;
+}
+
+.journal-moment p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.followup-card {
+  border: 1px solid var(--ink);
+  border-radius: 20px;
+  padding: 16px;
+  margin-top: 6px;
+}
+
+.followup-card h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+  letter-spacing: -.02em;
+}
+
+.followup-list {
+  display: grid;
+  gap: 9px;
+}
+
+.followup-item {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 8px;
+  align-items: start;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.followup-item span:first-child {
+  font-weight: 850;
+}
+
+.journal-closing {
+  margin: 18px 0 0;
+  padding: 15px 16px;
+  border-radius: 18px;
+  background: var(--paper-2);
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 750;
+}
+
+.journal-date {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+@media (min-width: 640px) {
+  .journal-moments {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 18px;
+  }
+  .journal-moment:nth-child(2) {
+    border-top: 0;
+    padding-top: 0;
+  }
+}
