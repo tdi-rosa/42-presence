@@ -1,4 +1,4 @@
-const CACHE_NAME = "dayflow-v2.0.2";
+const CACHE_NAME = "dayflow-v2.0.3";
 const SHELL = [
   "./",
   "./index.html",
@@ -15,11 +15,20 @@ self.addEventListener("install", event => {
 });
 
 self.addEventListener("activate", event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)));
+    await self.clients.claim();
+
+    // Force already-open Dayflow windows to reload once after a new worker
+    // becomes active. This makes PWA updates visible even if the old app
+    // missed the controllerchange event while the worker was installing.
+    const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    await Promise.all(clients.map(client => {
+      if ("navigate" in client) return client.navigate(client.url).catch(() => undefined);
+      return undefined;
+    }));
+  })());
 });
 
 self.addEventListener("fetch", event => {
