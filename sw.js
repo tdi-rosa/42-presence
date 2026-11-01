@@ -1,12 +1,11 @@
-const CACHE_NAME = "dayflow-v2.0.0";
+const CACHE_NAME = "dayflow-v2.0.1";
 const SHELL = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
   "./manifest.webmanifest",
-  "./icon-192.png",
-  "./icon-512.png"
+  "./icon.svg"
 ];
 
 self.addEventListener("install", event => {
