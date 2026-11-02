@@ -2,7 +2,7 @@
   "use strict";
 
   const STATE_KEY = "dayflow_v1";
-  const ALERTS_VERSION = 1;
+  const ALERTS_VERSION = 2;
 
   const seededAlerts = [
     {
@@ -17,11 +17,12 @@
     {
       id: "alert-freebox-fiber-2026-11-04",
       title: "Prendre la box Free avec moi",
-      detail: "À ne pas oublier lundi ou mardi en allant à l’appartement · technicien fibre mercredi 4 novembre.",
-      symbol: "↯",
+      detail: "Récupérée lundi 2 novembre · technicien fibre mercredi 4 novembre.",
+      symbol: "✓",
       priority: "critical",
-      done: false,
+      done: true,
       dueDate: "2026-11-03",
+      completedDate: "2026-11-02",
       createdAt: "2026-11-01T23:23:00+01:00"
     }
   ];
@@ -51,10 +52,24 @@
     if (!state) return;
     if (!Array.isArray(state.alerts)) state.alerts = [];
 
+    const previousVersion = Number(state.alertsVersion) || 0;
+
     seededAlerts.forEach(alert => {
-      if (!state.alerts.some(item => item?.id === alert.id)) state.alerts.push(alert);
+      if (!state.alerts.some(item => item?.id === alert.id)) state.alerts.push({ ...alert });
     });
-    state.alertsVersion = Math.max(Number(state.alertsVersion) || 0, ALERTS_VERSION);
+
+    if (previousVersion < 2) {
+      const freebox = state.alerts.find(item => item?.id === "alert-freebox-fiber-2026-11-04");
+      if (freebox) {
+        freebox.done = true;
+        freebox.doneAt = freebox.doneAt || new Date().toISOString();
+        freebox.completedDate = "2026-11-02";
+        freebox.detail = "Récupérée lundi 2 novembre · technicien fibre mercredi 4 novembre.";
+        freebox.symbol = "✓";
+      }
+    }
+
+    state.alertsVersion = ALERTS_VERSION;
     writeState(state);
   }
 
@@ -112,12 +127,12 @@
   }
 
   function escapeHtml(value) {
-    return String(value ?? "").replace(/[&<>'"]/g, char => ({
+    return String(value ?? "").replace(/[&<>'\"]/g, char => ({
       "&": "&amp;",
       "<": "&lt;",
       ">": "&gt;",
       "'": "&#39;",
-      '"': "&quot;"
+      '\"': "&quot;"
     }[char]));
   }
 })();
