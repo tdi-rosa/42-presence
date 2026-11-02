@@ -2,46 +2,58 @@
   "use strict";
 
   const STATE_KEY = "dayflow_v1";
-  const REVIEW_DATE = "2026-11-01";
+  const REVIEW_DATE = "2026-11-02";
 
   const journal = {
     version: 1,
-    title: "Une journée qui relance la machine",
-    summary: "Tu as avancé sur plusieurs fronts sans tout résoudre d’un coup. Le point important de la journée, c’est surtout d’avoir créé du mouvement : le déménagement est lancé, le travail en Go avance, ton outil d’apprentissage prend forme et les candidatures sont parties.",
+    title: "Une grosse journée, sans finir vidé",
+    summary: "La journée a été très chargée, mais elle s’est bien déroulée : sport le matin, vrai progrès sur le projet Go, déménagement poursuivi, box Free récupérée et une situation familiale qui semble s’apaiser. Le signal le plus encourageant : tu rentres tard tout en te sentant encore en forme.",
     moments: [
       {
         symbol: "↗",
-        title: "Déménagement",
-        text: "Tu as réellement commencé et créé du momentum, même s’il reste encore beaucoup à faire."
+        title: "Rythme du matin",
+        text: "Tu t’es réveillé assez tôt, tu es allé courir et tu as commencé l’école autour de 9 h 30–10 h. Le socle du matin fonctionne."
       },
       {
         symbol: "⌘",
         title: "Go",
-        text: "Tu as fini de recopier tout le tutoriel à la main. Tu es encore à l’étape compréhension, pas encore autonomie — c’est le prochain cap."
+        text: "Tu as terminé de recopier le tutoriel, puis tu as passé du temps à comprendre et schématiser les différentes portions de code. Tu as maintenant une vue d’ensemble et un organigramme complet ; la prochaine étape est de reconstruire progressivement sans recopier."
       },
       {
-        symbol: "✦",
-        title: "Outil d’apprentissage",
-        text: "Tu construis un outil relié à ChatGPT avec captures d’écran automatiques pour expliquer le code en temps réel. C’est une piste à poursuivre."
-      },
-      {
-        symbol: "✉",
-        title: "Candidatures",
-        text: "Des dizaines de candidatures sont parties pour des jobs de livraison vélo cargo et en code. Demain : vérifier les réponses une fois, sans surveiller la boîte mail en continu."
+        symbol: "↗",
+        title: "Déménagement",
+        text: "Tu as continué le déménagement et gardé le momentum lancé la veille. Il reste du travail, mais le chantier avance concrètement."
       },
       {
         symbol: "♡",
         title: "Famille",
-        text: "La discussion avec ta mère s’est mieux passée et elle a compris ce que tu voulais lui expliquer."
+        text: "Ta mère t’a dit que la situation s’arrange de son côté et qu’elle fait davantage attention à ses comptes. C’est un poids qui semble commencer à diminuer."
+      },
+      {
+        symbol: "✓",
+        title: "Box Free",
+        text: "Tu es bien allé récupérer la box Free avant le passage du technicien fibre mercredi. Cette alerte peut être considérée comme faite."
+      },
+      {
+        symbol: "✉",
+        title: "Candidatures",
+        text: "Pas de réponse notable aujourd’hui. Rien à relancer ce soir : un seul contrôle demain suffit."
+      },
+      {
+        symbol: "●",
+        title: "Énergie",
+        text: "Environ 7 h ont été enregistrées à l’école, avec des pauses comprises. Malgré une journée longue et chargée, tu ne te sens pas fatigué et tu rentres encore en forme."
       }
     ],
     followUps: [
-      "Refaire le tutoriel Go jusqu’à pouvoir reconstruire les parties importantes sans recopier.",
-      "Continuer l’outil de capture d’écran + explication temps réel et voir s’il accélère vraiment l’apprentissage.",
-      "Regarder demain les réponses aux candidatures dans un seul créneau dédié.",
-      "Continuer le déménagement sans perdre le momentum créé aujourd’hui."
+      "Go : passer de la compréhension à la reconstruction — refaire les parties importantes sans recopier, puis vérifier avec l’organigramme.",
+      "Abandonner l’idée de l’outil de captures d’écran pour l’instant : les échanges écrits avec ChatGPT à l’école sont déjà suffisamment efficaces.",
+      "Regarder une seule fois demain s’il y a des réponses aux candidatures, sans surveillance continue.",
+      "Continuer le déménagement à partir de 14 h 30 sans casser le bon rythme du matin."
     ],
-    closing: "J’ai avancé sur plusieurs fronts. Rien n’a besoin d’être réglé cette nuit."
+    closing: "Le système commence à fonctionner : matin utile, progrès réel, obligations avancées — sans finir la journée vidé.",
+    dateLabel: "2 novembre 2026",
+    kicker: "Bilan du lundi"
   };
 
   seedReview();
@@ -69,9 +81,9 @@
     state.reviews[REVIEW_DATE] = {
       ...existing,
       energy: existing.energy ?? null,
-      workedWell: existing.workedWell || "Bonne journée globalement : déménagement lancé, tutoriel Go recopié, outil d’apprentissage en cours, candidatures envoyées et discussion positive avec ma mère.",
-      blockedBy: existing.blockedBy || "Stress encore élevé en fin de journée, surtout autour de l’argent et du besoin de continuer à résoudre des problèmes au lieu de décrocher.",
-      note: existing.note || "À suivre : Go, outil d’apprentissage, réponses aux candidatures et poursuite du déménagement.",
+      workedWell: existing.workedWell || "Très bonne journée : course le matin, vrai progrès de compréhension sur le projet Go, déménagement poursuivi, box Free récupérée et bonne énergie malgré une journée longue.",
+      blockedBy: existing.blockedBy || "Pas de blocage majeur aujourd’hui. Pas encore de réponse côté emploi ; l’enjeu est surtout de ne pas transformer l’attente en vérification compulsive.",
+      note: existing.note || "À suivre : refaire le Go sans recopier, continuer le déménagement, vérifier les candidatures une seule fois demain. L’outil de captures d’écran est mis de côté car il semble inutilement complexe.",
       journal,
       updatedAt: new Date().toISOString()
     };
@@ -120,7 +132,7 @@
     `).join("");
 
     card.innerHTML = `
-      <div class="journal-kicker">Bilan du dimanche</div>
+      <div class="journal-kicker">${escapeHtml(data.kicker || "Bilan du jour")}</div>
       <h2 class="journal-title">${escapeHtml(data.title)}</h2>
       <p class="journal-lead">${escapeHtml(data.summary)}</p>
       <div class="journal-moments">${moments}</div>
@@ -129,7 +141,7 @@
         <div class="followup-list">${followUps}</div>
       </div>
       <p class="journal-closing">${escapeHtml(data.closing)}</p>
-      <p class="journal-date">1 novembre 2026</p>
+      <p class="journal-date">${escapeHtml(data.dateLabel || REVIEW_DATE)}</p>
     `;
   }
 
@@ -145,12 +157,12 @@
   }
 
   function escapeHtml(value) {
-    return String(value ?? "").replace(/[&<>'"]/g, char => ({
+    return String(value ?? "").replace(/[&<>'\"]/g, char => ({
       "&": "&amp;",
       "<": "&lt;",
       ">": "&gt;",
       "'": "&#39;",
-      '"': "&quot;"
+      '\"': "&quot;"
     }[char]));
   }
 })();
