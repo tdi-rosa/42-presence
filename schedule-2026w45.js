@@ -4,7 +4,7 @@
   const STATE_KEY = "dayflow_v1";
   const MIGRATION_KEY = "dayflow_schedule_2026w45_v1";
 
-  if (localStorage.getItem(MIGRATION_KEY)) return;
+  if (localStorage.getItem(MIGRATION_KEY)) { seedFiberSlot(); return; }
 
   let state;
   try {
@@ -123,4 +123,32 @@
 
   localStorage.setItem(STATE_KEY, JSON.stringify(state));
   localStorage.setItem(MIGRATION_KEY, createdAt);
+  seedFiberSlot();
+
+  function seedFiberSlot() {
+    const fiberKey = "dayflow_fiber_2026_11_04_14_16_v1";
+    if (localStorage.getItem(fiberKey)) return;
+    let saved;
+    try { saved = JSON.parse(localStorage.getItem(STATE_KEY)); } catch { saved = null; }
+    if (!saved || !Array.isArray(saved.events)) return;
+
+    const exists = saved.events.some(e => e?.date === "2026-11-04"
+      && /fibre|technicien.*free|free.*technicien/i.test(e.title || ""));
+    if (!exists) {
+      saved.events.push({
+        id: "seed-fiber-technician-2026-11-04",
+        title: "Technicien fibre — nouvel appartement",
+        category: "admin",
+        date: "2026-11-04",
+        start: "14:00",
+        end: "16:00",
+        recurrence: null,
+        protected: true,
+        note: "Créneau d'intervention communiqué : entre 14 h et 16 h. Être sur place pendant tout le créneau. Box Free déjà récupérée.",
+        createdAt: new Date().toISOString()
+      });
+    }
+    localStorage.setItem(STATE_KEY, JSON.stringify(saved));
+    localStorage.setItem(fiberKey, new Date().toISOString());
+  }
 })();
