@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const APP_VERSION = "2.0.0";
+  const APP_VERSION = "2.4.0";
   const STATE_KEY = "dayflow_v1";
   const LEGACY_KEY = "presence42_v1";
   const MIGRATION_KEY = "dayflow_presence42_migrated_v1";
@@ -253,6 +253,9 @@
     else renderWeek(date);
     renderToday42Card();
     renderHeader();
+    window.dispatchEvent(new CustomEvent("dayflow:agenda-render", {
+      detail: { date: dateKey(date), view: agendaView }
+    }));
   }
 
   function renderDay(date) {
