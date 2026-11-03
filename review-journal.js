@@ -56,7 +56,59 @@
     kicker: "Bilan du lundi"
   };
 
+
+  const REVIEW_DATE_LATEST = "2026-11-03";
+  const journalNov3 = {
+    "version": 1,
+    "title": "La compréhension devient de l’autonomie",
+    "summary": "Une journée d’apprentissage solide : course avant le travail, premières portions du projet Go refaites de mémoire, puis une longue réunion riche en réflexions sur le métier de développeur. Le déménagement a été reporté à cause de la météo et du temps disponible, sans que cela annule les progrès du jour.",
+    "moments": [
+      {
+        "symbol": "↗",
+        "title": "Course et matinée 42",
+        "text": "Course vers 9 h, puis travail à l’école jusqu’à environ 13–14 h. Le rythme du matin se confirme."
+      },
+      {
+        "symbol": "⌘",
+        "title": "Go : mémoire et compréhension",
+        "text": "Tu as réécrit une partie du programme et constaté que tu retenais la logique et l’implémentation. La fonction run de server.go reste intimidante, mais tu sais désormais qu’un découpage en petits blocs peut aider."
+      },
+      {
+        "symbol": "◷",
+        "title": "Déménagement reporté",
+        "text": "La météo, la tombée de la nuit et la réunion du soir ont rendu le déménagement peu pratique. À reprendre mercredi, sans considérer ce report comme un échec."
+      },
+      {
+        "symbol": "✧",
+        "title": "Une idée de jeu à conserver",
+        "text": "Après Hansar Protocol, explorer un petit jeu personnel à l’esthétique sombre inspirée de Fear and Hunger, suffisamment abouti pour figurer dans un portfolio artistique."
+      },
+      {
+        "symbol": "◎",
+        "title": "Conditions de travail dans la tech",
+        "text": "La réunion du soir a suscité une réflexion sur l’emploi des développeurs, les transformations liées à l’IA et les relations de travail. Une piste à creuser plutôt qu’une conclusion définitive."
+      },
+      {
+        "symbol": "◇",
+        "title": "Open source et graphes",
+        "text": "Explorer comment contribuer à l’open source pour participer plus directement au progrès technique. Les algorithmes de graphes peuvent rester une activité secondaire quand le projet principal devient trop prenant."
+      }
+    ],
+    "followUps": [
+      "Go : attaquer run dans server.go par petits blocs, en s’aidant de l’organigramme et en testant la mémoire sans se forcer à tout reconstruire d’un coup.",
+      "Déménagement : essayer de poursuivre mercredi 4 novembre si les conditions s’y prêtent.",
+      "Hansar Protocol : garder l’idée d’un petit jeu à l’esthétique Fear and Hunger pour le portfolio, sans ouvrir immédiatement un projet trop ambitieux.",
+      "Open source : identifier un projet et une première contribution réaliste, à explorer plus tard.",
+      "Algorithmes de graphes : conserver cette curiosité comme respiration entre deux séances de travail principales."
+    ],
+    "closing": "Tu ne fais plus seulement suivre un tutoriel : tu commences à retrouver le code par toi-même. C’est le progrès essentiel du jour.",
+    "dateLabel": "3 novembre 2026",
+    "kicker": "Bilan du mardi"
+  };
+  let currentJournalDate = REVIEW_DATE_LATEST;
+
   seedReview();
+  seedLatestReview();
   renderJournal();
   decorateHistoryHeading();
 
@@ -102,7 +154,7 @@
       state = null;
     }
 
-    const review = state?.reviews?.[REVIEW_DATE];
+    const review = state?.reviews?.[currentJournalDate];
     const data = review?.journal;
     if (!data) return;
 
@@ -141,8 +193,40 @@
         <div class="followup-list">${followUps}</div>
       </div>
       <p class="journal-closing">${escapeHtml(data.closing)}</p>
-      <p class="journal-date">${escapeHtml(data.dateLabel || REVIEW_DATE)}</p>
+      <p class="journal-date">${escapeHtml(data.dateLabel || currentJournalDate)}</p>
     `;
+
+    const nav = document.createElement("div");
+    nav.className = "journal-navigation";
+    [["2026-11-03", "Mar. 3"], ["2026-11-02", "Lun. 2"]].forEach(([date, label]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.className = "journal-day-button" + (currentJournalDate === date ? " active" : "");
+      button.setAttribute("aria-pressed", String(currentJournalDate === date));
+      button.addEventListener("click", () => { currentJournalDate = date; renderJournal(); });
+      nav.appendChild(button);
+    });
+    card.prepend(nav);
+  }
+
+  function seedLatestReview() {
+    let state;
+    try { state = JSON.parse(localStorage.getItem(STATE_KEY)); } catch { state = null; }
+    if (!state || typeof state !== "object") return;
+    if (!state.reviews || typeof state.reviews !== "object") state.reviews = {};
+    const existing = state.reviews[REVIEW_DATE_LATEST] || {};
+    if (existing.journal?.version === journalNov3.version) return;
+    state.reviews[REVIEW_DATE_LATEST] = {
+      ...existing,
+      energy: existing.energy ?? null,
+      workedWell: existing.workedWell || "Course et bonne matinée à 42 ; premières portions de Go reconstruites de mémoire ; échanges enrichissants le soir.",
+      blockedBy: existing.blockedBy || "Déménagement reporté en raison de la météo et du rendez-vous du soir. La fonction run de server.go demande encore un découpage progressif.",
+      note: existing.note || "À suivre : travailler run par petites parties, reprendre le déménagement mercredi, conserver les pistes Hansar Protocol (jeu de portfolio), open source et algorithmes de graphes.",
+      journal: journalNov3,
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(STATE_KEY, JSON.stringify(state));
   }
 
   function decorateHistoryHeading() {
