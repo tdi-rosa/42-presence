@@ -75,7 +75,7 @@
     const blocks = chooseBlocks(date);
     const highlight = date === "2026-11-04";
     const lead = highlight ? "Avancer sur Go, sans forcer le rythme" : "Quelques repères pour la journée";
-    const extra = highlight ? '<p class="compass-note"><span aria-hidden="true">◇</span> Fibre : passage du technicien mercredi · horaire à vérifier</p>' : "";
+    const extra = highlight ? '<p class="compass-note"><span aria-hidden="true">◇</span> Fibre : technicien entre 14 h et 16 h · présence sur place</p>' : "";
     card.innerHTML =
       '<div class="compass-head"><span class="compass-eyebrow">CAP DU JOUR</span><span class="compass-date">' + esc(dateLabel(date)) + '</span></div>' +
       '<p class="compass-lead">' + esc(lead) + '</p>' +
