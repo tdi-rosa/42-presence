@@ -2,7 +2,7 @@
   "use strict";
 
   const STATE_KEY = "dayflow_v1";
-  const ALERTS_VERSION = 3;
+  const ALERTS_VERSION = 4;
 
   const seededAlerts = [
     {
@@ -17,7 +17,7 @@
     {
       id: "alert-fiber-technician-2026-11-04",
       title: "Rendez-vous technicien fibre",
-      detail: "Mercredi 4 novembre · nouvel appartement · horaire à vérifier.",
+      detail: "Mercredi 4 novembre · 14 h–16 h · être présent au nouvel appartement.",
       symbol: "!",
       priority: "critical",
       done: false,
@@ -77,6 +77,11 @@
         freebox.detail = "Récupérée lundi 2 novembre · technicien fibre mercredi 4 novembre.";
         freebox.symbol = "✓";
       }
+    }
+
+    if (previousVersion < 4) {
+      const fiber = state.alerts.find(item => item?.id === "alert-fiber-technician-2026-11-04");
+      if (fiber && !fiber.done) fiber.detail = "Mercredi 4 novembre · 14 h–16 h · être présent au nouvel appartement.";
     }
 
     state.alertsVersion = ALERTS_VERSION;
