@@ -2,7 +2,7 @@
   "use strict";
 
   const STATE_KEY = "dayflow_v1";
-  const ALERTS_VERSION = 2;
+  const ALERTS_VERSION = 3;
 
   const seededAlerts = [
     {
@@ -13,6 +13,16 @@
       priority: "high",
       done: false,
       createdAt: "2026-11-01T23:23:00+01:00"
+    },
+    {
+      id: "alert-fiber-technician-2026-11-04",
+      title: "Rendez-vous technicien fibre",
+      detail: "Mercredi 4 novembre · nouvel appartement · horaire à vérifier.",
+      symbol: "!",
+      priority: "critical",
+      done: false,
+      dueDate: "2026-11-04",
+      createdAt: "2026-11-03T23:00:00+01:00"
     },
     {
       id: "alert-freebox-fiber-2026-11-04",
