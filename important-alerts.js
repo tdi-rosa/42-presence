@@ -25,6 +25,15 @@
       createdAt: "2026-11-03T23:00:00+01:00"
     },
     {
+      id: "alert-freebox-cancellation-2026-11-05",
+      title: "Demander la résiliation de la Freebox",
+      detail: "Raccordement échoué le 4 novembre. Demander le rapport du technicien et la prise en charge des frais au 3244.",
+      symbol: "!",
+      priority: "high",
+      done: false,
+      createdAt: "2026-11-04T22:39:00+01:00"
+    },
+    {
       id: "alert-freebox-fiber-2026-11-04",
       title: "Prendre la box Free avec moi",
       detail: "Récupérée lundi 2 novembre · technicien fibre mercredi 4 novembre.",
