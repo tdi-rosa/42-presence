@@ -34,6 +34,13 @@
   }
 
   function chooseBlocks(date) {
+    if (date === "2026-11-05") {
+      return [
+        { icon: "⌘", when: "Matin", title: "42 · Hansar Protocol", detail: "Une vraie séance de travail" },
+        { icon: "◫", when: "Après-midi", title: "Déménagement", detail: "Reprendre à l’appartement" },
+        { icon: "♨", when: "Soir", title: "Curry maison", detail: "Bien manger, garder des portions" }
+      ];
+    }
     if (date === "2026-11-04") {
       return [
         { icon: "↗", when: "Matin", title: "Course + 42", detail: "Go : décomposer run" },
@@ -73,9 +80,9 @@
     card.hidden = view !== "day";
     if (card.hidden) return;
     const blocks = chooseBlocks(date);
-    const highlight = date === "2026-11-04";
-    const lead = highlight ? "Avancer sur Go, sans forcer le rythme" : "Quelques repères pour la journée";
-    const extra = highlight ? '<p class="compass-note"><span aria-hidden="true">◇</span> Fibre : technicien entre 14 h et 16 h · présence sur place</p>' : "";
+    const highlight = date === "2026-11-04" || date === "2026-11-05";
+    const lead = date === "2026-11-05" ? "Hansar Protocol, déménagement et bon curry" : highlight ? "Avancer sur Go, sans forcer le rythme" : "Quelques repères pour la journée";
+    const extra = date === "2026-11-04" ? '<p class="compass-note"><span aria-hidden="true">◇</span> Fibre : technicien entre 14 h et 16 h · présence sur place</p>' : "";
     card.innerHTML =
       '<div class="compass-head"><span class="compass-eyebrow">CAP DU JOUR</span><span class="compass-date">' + esc(dateLabel(date)) + '</span></div>' +
       '<p class="compass-lead">' + esc(lead) + '</p>' +
