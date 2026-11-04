@@ -107,19 +107,21 @@
   };
 
   const journalNov4 = {
-    version: 1,
+    version: 2,
     title: "Une journée positive, consacrée aussi à NA",
-    summary: "La journée s’est bien passée. Tu as un peu avancé sur Hansar Protocol, même si ce n’était pas une grosse séance. Le travail pour Narcotiques Anonymes a occupé une bonne partie de l’après-midi, et le rendez-vous s’est très bien déroulé. Le déménagement n’a pas pu avancer aujourd’hui.",
+    summary: "La journée s’est bien passée. Tu as un peu avancé sur Hansar Protocol, même si ce n’était pas une grosse séance. Le travail pour Narcotiques Anonymes a occupé une bonne partie de l’après-midi, et le rendez-vous s’est très bien déroulé. Le déménagement n’a pas pu avancer aujourd’hui. Le technicien fibre est passé, mais le raccordement n’a pas pu être réalisé.",
     moments: [
       { symbol: "⌘", title: "Hansar Protocol", text: "Un peu de temps consacré au projet, sans progression massive aujourd’hui. Tu souhaites lui réserver une vraie séance demain." },
       { symbol: "◎", title: "Narcotiques Anonymes", text: "Rendez-vous très positif. Les préparatifs et le travail liés à NA ont pris une bonne partie de l’après-midi." },
       { symbol: "◫", title: "Déménagement à reprendre", text: "Tu n’as pas eu le temps d’aller à l’appartement pour avancer le déménagement. Tu souhaites le poursuivre jeudi." },
-      { symbol: "♡", title: "Prendre soin du quotidien", text: "Tu aimerais retrouver une alimentation plus satisfaisante en prenant le temps de préparer un bon curry maison demain." }
+      { symbol: "♡", title: "Prendre soin du quotidien", text: "Tu aimerais retrouver une alimentation plus satisfaisante en prenant le temps de préparer un bon curry maison demain." },
+      { symbol: "!", title: "Fibre : installation impossible", text: "Le technicien est bien intervenu mercredi 4 novembre, mais n’a pas réussi à raccorder la fibre. Tu envisages de résilier la Freebox : la connexion de ton téléphone semble te suffire à domicile." }
     ],
     followUps: [
       "Jeudi 5 novembre : consacrer un vrai bloc de travail à Hansar Protocol, sans chercher à tout terminer.",
       "Poursuivre le déménagement si le temps disponible le permet.",
-      "Préparer un curry nourrissant, avec l’idée de manger mieux et éventuellement d’avoir des portions pour les prochains jours."
+      "Préparer un curry nourrissant, avec l’idée de manger mieux et éventuellement d’avoir des portions pour les prochains jours.",
+      "Freebox : récupérer le compte rendu de l’échec de raccordement, appeler le 3244 et demander une résiliation sans frais avant de valider une procédure standard."
     ],
     closing: "Le temps consacré à NA n’était pas du temps perdu : tu as avancé sur un engagement important. Demain, tu peux recentrer la journée sur Hansar Protocol, le déménagement et un repas maison.",
     dateLabel: "4 novembre 2026",
@@ -263,7 +265,7 @@
       energy: existing.energy ?? null,
       workedWell: existing.workedWell || "Journée globalement positive : un peu de Hansar Protocol, un rendez-vous NA qui s’est très bien passé et du travail pour NA l’après-midi.",
       blockedBy: existing.blockedBy || "Pas eu le temps d’aller à l’appartement pour le déménagement.",
-      note: existing.note || "Pour jeudi : bien travailler sur Hansar Protocol, poursuivre le déménagement et préparer un bon curry maison.",
+      note: existing.note || "Pour jeudi : bien travailler sur Hansar Protocol, poursuivre le déménagement et préparer un bon curry maison. Fibre : intervention effectuée le 4 novembre, raccordement impossible ; demander une résiliation Freebox sans frais, avec justificatif.",
       journal: journalNov4,
       updatedAt: new Date().toISOString()
     };
