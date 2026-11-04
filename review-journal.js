@@ -105,10 +105,31 @@
     "dateLabel": "3 novembre 2026",
     "kicker": "Bilan du mardi"
   };
-  let currentJournalDate = REVIEW_DATE_LATEST;
+
+  const journalNov4 = {
+    version: 1,
+    title: "Une journée positive, consacrée aussi à NA",
+    summary: "La journée s’est bien passée. Tu as un peu avancé sur Hansar Protocol, même si ce n’était pas une grosse séance. Le travail pour Narcotiques Anonymes a occupé une bonne partie de l’après-midi, et le rendez-vous s’est très bien déroulé. Le déménagement n’a pas pu avancer aujourd’hui.",
+    moments: [
+      { symbol: "⌘", title: "Hansar Protocol", text: "Un peu de temps consacré au projet, sans progression massive aujourd’hui. Tu souhaites lui réserver une vraie séance demain." },
+      { symbol: "◎", title: "Narcotiques Anonymes", text: "Rendez-vous très positif. Les préparatifs et le travail liés à NA ont pris une bonne partie de l’après-midi." },
+      { symbol: "◫", title: "Déménagement à reprendre", text: "Tu n’as pas eu le temps d’aller à l’appartement pour avancer le déménagement. Tu souhaites le poursuivre jeudi." },
+      { symbol: "♡", title: "Prendre soin du quotidien", text: "Tu aimerais retrouver une alimentation plus satisfaisante en prenant le temps de préparer un bon curry maison demain." }
+    ],
+    followUps: [
+      "Jeudi 5 novembre : consacrer un vrai bloc de travail à Hansar Protocol, sans chercher à tout terminer.",
+      "Poursuivre le déménagement si le temps disponible le permet.",
+      "Préparer un curry nourrissant, avec l’idée de manger mieux et éventuellement d’avoir des portions pour les prochains jours."
+    ],
+    closing: "Le temps consacré à NA n’était pas du temps perdu : tu as avancé sur un engagement important. Demain, tu peux recentrer la journée sur Hansar Protocol, le déménagement et un repas maison.",
+    dateLabel: "4 novembre 2026",
+    kicker: "Bilan du mercredi"
+  };
+  let currentJournalDate = "2026-11-04";
 
   seedReview();
   seedLatestReview();
+  seedNov4Review();
   renderJournal();
   decorateHistoryHeading();
 
@@ -198,7 +219,7 @@
 
     const nav = document.createElement("div");
     nav.className = "journal-navigation";
-    [["2026-11-03", "Mar. 3"], ["2026-11-02", "Lun. 2"]].forEach(([date, label]) => {
+    [["2026-11-04", "Mer. 4"], ["2026-11-03", "Mar. 3"], ["2026-11-02", "Lun. 2"]].forEach(([date, label]) => {
       const button = document.createElement("button");
       button.type = "button";
       button.textContent = label;
@@ -224,6 +245,26 @@
       blockedBy: existing.blockedBy || "Déménagement reporté en raison de la météo et du rendez-vous du soir. La fonction run de server.go demande encore un découpage progressif.",
       note: existing.note || "À suivre : travailler run par petites parties, reprendre le déménagement mercredi, conserver les pistes Hansar Protocol (jeu de portfolio), open source et algorithmes de graphes.",
       journal: journalNov3,
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+  }
+
+
+  function seedNov4Review() {
+    let state;
+    try { state = JSON.parse(localStorage.getItem(STATE_KEY)); } catch { state = null; }
+    if (!state || typeof state !== "object") return;
+    if (!state.reviews || typeof state.reviews !== "object") state.reviews = {};
+    const existing = state.reviews["2026-11-04"] || {};
+    if (existing.journal?.version === journalNov4.version) return;
+    state.reviews["2026-11-04"] = {
+      ...existing,
+      energy: existing.energy ?? null,
+      workedWell: existing.workedWell || "Journée globalement positive : un peu de Hansar Protocol, un rendez-vous NA qui s’est très bien passé et du travail pour NA l’après-midi.",
+      blockedBy: existing.blockedBy || "Pas eu le temps d’aller à l’appartement pour le déménagement.",
+      note: existing.note || "Pour jeudi : bien travailler sur Hansar Protocol, poursuivre le déménagement et préparer un bon curry maison.",
+      journal: journalNov4,
       updatedAt: new Date().toISOString()
     };
     localStorage.setItem(STATE_KEY, JSON.stringify(state));
