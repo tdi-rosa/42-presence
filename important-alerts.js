@@ -2,7 +2,7 @@
   "use strict";
 
   const STATE_KEY = "dayflow_v1";
-  const ALERTS_VERSION = 4;
+  const ALERTS_VERSION = 5;
 
   const seededAlerts = [
     {
@@ -84,6 +84,15 @@
       if (fiber && !fiber.done) fiber.detail = "Mercredi 4 novembre · 14 h–16 h · être présent au nouvel appartement.";
     }
 
+    if (previousVersion < 5) {
+      const visit = state.alerts.find(item => item?.id === "alert-fiber-technician-2026-11-04");
+      if (visit) {
+        visit.done = true;
+        visit.doneAt = visit.doneAt || new Date().toISOString();
+        visit.completedDate = "2026-11-04";
+        visit.detail = "Le technicien est passé le 4 novembre, mais le raccordement a échoué.";
+      }
+    }
     state.alertsVersion = ALERTS_VERSION;
     writeState(state);
   }
