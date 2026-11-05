@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const APP_VERSION = "2.4.4";
+  const APP_VERSION = "2.4.5";
   const STATE_KEY = "dayflow_v1";
   const LEGACY_KEY = "presence42_v1";
   const MIGRATION_KEY = "dayflow_presence42_migrated_v1";

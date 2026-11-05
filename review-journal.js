@@ -127,7 +127,7 @@
     dateLabel: "4 novembre 2026",
     kicker: "Bilan du mercredi"
   };
-  let currentJournalDate = "2026-11-04";
+  let currentJournalDate = "2026-11-05";
 
   seedReview();
   seedLatestReview();
@@ -221,7 +221,7 @@
 
     const nav = document.createElement("div");
     nav.className = "journal-navigation";
-    [["2026-11-04", "Mer. 4"], ["2026-11-03", "Mar. 3"], ["2026-11-02", "Lun. 2"]].forEach(([date, label]) => {
+    [["2026-11-05", "Jeu. 5"], ["2026-11-04", "Mer. 4"], ["2026-11-03", "Mar. 3"], ["2026-11-02", "Lun. 2"]].forEach(([date, label]) => {
       const button = document.createElement("button");
       button.type = "button";
       button.textContent = label;

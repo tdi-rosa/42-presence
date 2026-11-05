@@ -34,6 +34,18 @@
   }
 
   function chooseBlocks(date) {
+    if (date === "2026-11-06") {
+      return [
+        { icon: "↗", when: "Matin", title: "Course + 42", detail: "Hansar : finir Handle et Reply" },
+        { icon: "◫", when: "Après-midi", title: "Déménagement", detail: "Nettoyage et rangement" },
+        { icon: "◇", when: "Si envie", title: "Lecture", detail: "Grokking Algorithms" }
+      ];
+    }
+    if (date === "2026-11-07") {
+      return [
+        { icon: "◎", when: "9 h–18 h", title: "ASR", detail: "Journée associative" }
+      ];
+    }
     if (date === "2026-11-05") {
       return [
         { icon: "⌘", when: "Matin", title: "42 · Hansar Protocol", detail: "Une vraie séance de travail" },
@@ -80,8 +92,8 @@
     card.hidden = view !== "day";
     if (card.hidden) return;
     const blocks = chooseBlocks(date);
-    const highlight = date === "2026-11-04" || date === "2026-11-05";
-    const lead = date === "2026-11-05" ? "Hansar Protocol, déménagement et bon curry" : highlight ? "Avancer sur Go, sans forcer le rythme" : "Quelques repères pour la journée";
+    const highlight = ["2026-11-04", "2026-11-05", "2026-11-06", "2026-11-07"].includes(date);
+    const lead = date === "2026-11-07" ? "ASR : la journée est réservée" : date === "2026-11-06" ? "Hansar, déménagement et un peu de lecture" : date === "2026-11-05" ? "Hansar Protocol, déménagement et bon curry" : highlight ? "Avancer sur Go, sans forcer le rythme" : "Quelques repères pour la journée";
     const extra = date === "2026-11-04" ? '<p class="compass-note"><span aria-hidden="true">◇</span> Fibre : technicien entre 14 h et 16 h · présence sur place</p>' : "";
     card.innerHTML =
       '<div class="compass-head"><span class="compass-eyebrow">CAP DU JOUR</span><span class="compass-date">' + esc(dateLabel(date)) + '</span></div>' +
